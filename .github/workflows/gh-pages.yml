@@ -7,11 +7,15 @@ on:
   pull_request:
   workflow_dispatch:
 
+
+
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+      pages: write
+      id-token: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:

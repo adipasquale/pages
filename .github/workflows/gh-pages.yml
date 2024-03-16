@@ -34,14 +34,14 @@ jobs:
           path: ./.cache
           key: ${{ runner.os }}-eleventy-fetch-cache
 
-
       - run: npm install
-      - run: npm run build-ghpages
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+      - run: npm run build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          cname: www.dipasquale.fr
+          path: _site
+
+      - name: Deploy artifcat to GitHub Pages
+        uses: actions/deploy-pages@v4

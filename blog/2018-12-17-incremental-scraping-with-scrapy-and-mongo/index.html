@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Incremental crawler with Scrapy and MongoDB</title>
+		<meta name="description" content="Adrien Di Paquale personal website">
+
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Adrien">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Adrien">
+		<meta name="generator" content="Eleventy v2.0.1">
+
+		<link rel="stylesheet" href="/eleventy-base-blog/css/new.css">
+		<link rel="stylesheet" href="/eleventy-base-blog/css/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="#skip" class="visually-hidden">Skip to main content</a>
+			<h1>Adrien</h1>
+			<h2 class="visually-hidden">Menu</h2>
+			<nav>
+					<a href="/eleventy-base-blog/">
+						Home
+					</a>
+					<a href="/eleventy-base-blog/blog/">
+						Blog
+					</a>
+					<a href="/eleventy-base-blog/pianopiano/">
+						Piano Piano
+					</a>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+
+<link rel="stylesheet" href="/eleventy-base-blog/css/prism-okaidia.css">
+
+<h1>Incremental crawler with Scrapy and MongoDB</h1>
+
+<p>
+	<time datetime="2018-12-17">
+		17 December 2018
+	</time>
+</p>
+
+<hr>
+
+
+
+<ul>
+<li>updated on 25/12/2018 : <a href="https://github.com/adipasquale/blog.dipasquale.fr/commit/8d2b191e1a1a7151c6b01b088d9c98812376aec1"><em>fixed from_crawler method overriding</em></a></li>
+</ul>
+<p>In this post I will show you how to scrape a website incrementally.
+Each new scraping session will only scrape new items.
+We will be crawling <a href="https://techcrunch.com/">Techcrunch blog posts</a> as an example here.</p>
+<p>This tutorial will use Scrapy, a great Python scraping library.
+It's simple yet very powerful.
+If you don't know it, have a look at their <a href="https://doc.scrapy.org/en/latest/intro/overview.html">overview page</a>.</p>
+<p>We will also use MongoDB, the famous NoSQL DB, but it would be a similar process with any DB you want.</p>
+<p><strong>TLDR;</strong> if you already know Scrapy, head to the <a href="#incremental">last part about incremental scraping</a>. You can find the full code for this project <a href="https://github.com/adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb">here on GitHub</a>.</p>
+<h1 id="setup-your-scrapy-spider" tabindex="-1">Setup your Scrapy spider <a class="header-anchor" href="#setup-your-scrapy-spider">#</a></h1>
+<p>Start by installing Scrapy</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">pip3 <span class="token function">install</span> scrapy</code></pre>
+<p><em>(in a real project, you would use a <a href="https://virtualenv.pypa.io/en/latest/">virtualenv</a> and a <code>requirements.txt</code> file)</em></p>
+<p>and initialize your project with:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">scrapy startproject tc_scraper
+<span class="token builtin class-name">cd</span> tc_scraper
+scrapy genspider techcrunch techcrunch.com</code></pre>
+<h1 id="scrape-the-posts" tabindex="-1">Scrape the posts <a class="header-anchor" href="#scrape-the-posts">#</a></h1>
+<h2 id="play-around-in-the-shell" tabindex="-1">Play around in the shell <a class="header-anchor" href="#play-around-in-the-shell">#</a></h2>
+<p>First have a look at the DOM structure on <a href="https://www.techcrunch.com">https://www.techcrunch.com</a>, using your browser's developer tools.</p>
+<p><strong>Make sure to disable Javascript</strong>, because the scraper will not execute it by default.
+It's doable with Scrapy, but it's not the point of this tutorial.
+I'm using <a href="https://addons.mozilla.org/en-US/firefox/addon/javascript-toggler/">this extension</a> to easily disable JS on Firefox.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/K1lq4zmGWW-1297.avif 1297w"><source type="image/webp" srcset="/eleventy-base-blog/img/K1lq4zmGWW-1297.webp 1297w"><img alt="inspection of Techcrunch's DOM in Firefox" loading="lazy" decoding="async" src="/eleventy-base-blog/img/K1lq4zmGWW-1297.png" width="1297" height="989"></picture></p>
+<p>You can then open a Scrapy shell with</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">scrapy shell https://www.techcrunch.com</code></pre>
+<p>This shell is very helpful to play around and figure out how to extract the data. Here are some commands you can try one by one:</p>
+<pre class="language-py" tabindex="0"><code class="language-py">response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block"</span><span class="token punctuation">)</span>
+posts <span class="token operator">=</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block"</span><span class="token punctuation">)</span>
+posts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+posts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block__title__link"</span><span class="token punctuation">)</span>
+title <span class="token operator">=</span> posts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block__title__link"</span><span class="token punctuation">)</span>
+title
+title<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">"::attr(href)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract<span class="token punctuation">(</span><span class="token punctuation">)</span>
+title<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">"::attr(href)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>We are using CSS selectors, and the <code>attr</code> function on CSS3 pseudo-elements.
+Learn more about this extraction part in the <a href="https://doc.scrapy.org/en/latest/topics/selectors.html">scrapy docs</a>.</p>
+<h2 id="scrapy-architecture" tabindex="-1">Scrapy architecture <a class="header-anchor" href="#scrapy-architecture">#</a></h2>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/M8E8zmMYaF-700.avif 700w"><source type="image/webp" srcset="/eleventy-base-blog/img/M8E8zmMYaF-700.webp 700w"><img alt="scrapy architecture" loading="lazy" decoding="async" src="/eleventy-base-blog/img/M8E8zmMYaF-700.png" width="700" height="494"></picture></p>
+<p>This diagram  from <a href="https://doc.scrapy.org/en/0.10.3/topics/architecture.html">scrapy docs</a> is a quick overview of how Scrapy works:</p>
+<ul>
+<li>The <span style="color:#DC2300;">Spider</span> yields <span style="color:#8AAF59">Requests</span>, which are sent to the <span style="color:#CCCCFF">Scheduler</span>.</li>
+<li>The <span style="color:#CCCCFF">Scheduler</span> sends <span style="color:#8AAF59">Requests</span> to the <span style="color:#E6E64C">Downloader</span>, which executes them against the distant website.</li>
+<li>The <span style="color:#8AAF59">Responses</span> are sent to the <span style="color:#DC2300;">Spider</span> for parsing.</li>
+<li>The <span style="color:#DC2300;">Spider</span> parses and yields Items, which are sent to the <span style="color:#FF9966">Item Pipeline</span>.</li>
+<li>The <span style="color:#FF9966">Item Pipeline</span> is responsible for processing them and storing them.</li>
+</ul>
+<p>In this tutorial, we will not touch the <span style="color:#CCCCFF">Scheduler</span>, nor the <span style="color:#E6E64C">Downloader</span>.</p>
+<p>We will only write a <span style="color:#DC2300;">Spider</span> and tweak the <span style="color:#FF9966">Item Pipeline</span>.</p>
+<h2 id="scrape-the-list-pages" tabindex="-1">Scrape the list pages <a class="header-anchor" href="#scrape-the-list-pages">#</a></h2>
+<p>So let's write the first part of the scraper:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># spiders/techcrunch.py</span>
+
+<span class="token keyword">import</span> scrapy
+
+
+<span class="token keyword">class</span> <span class="token class-name">TechcrunchSpider</span><span class="token punctuation">(</span>scrapy<span class="token punctuation">.</span>Spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    name <span class="token operator">=</span> <span class="token string">'techcrunch'</span>
+    allowed_domains <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'techcrunch.com'</span><span class="token punctuation">]</span>
+    start_urls <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'https://techcrunch.com/'</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">parse</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> post <span class="token keyword">in</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            title <span class="token operator">=</span> post<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block__title__link"</span><span class="token punctuation">)</span>
+            url <span class="token operator">=</span> title<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">"::attr(href)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">yield</span> scrapy<span class="token punctuation">.</span>Request<span class="token punctuation">(</span>url<span class="token punctuation">,</span> callback<span class="token operator">=</span>self<span class="token punctuation">.</span>parse_post<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".load-more"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            next_page_url <span class="token operator">=</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".load-more::attr(href)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">yield</span> scrapy<span class="token punctuation">.</span>Request<span class="token punctuation">(</span>next_page_url<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">parse_post</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span></code></pre>
+<p>Here is a walkthrough of this spider:</p>
+<ul>
+<li>It starts by scraping the start url https://techcrunch.com/</li>
+<li>It goes through all posts blocks, extracts the link, and enqueues a new request.
+This new request will use a different callback from the default one: <code>parse_post</code></li>
+<li>After going through all the posts, it looks for a next page link, and if it finds it, it enqueues a new request with that link.
+This request will use the default callback <code>parse</code></li>
+</ul>
+<p>You can run it with <code>scrapy crawl techcrunch</code>, but be aware that it will go through ALL the pages (thousands here), so be ready to hit <code>CTRL+C</code> to stop it!</p>
+<h2 id="add-a-pages-limit-argument" tabindex="-1">Add a pages limit argument <a class="header-anchor" href="#add-a-pages-limit-argument">#</a></h2>
+<p>In order to avoid this problem, let's add a pages limit argument to our spider right now:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># spiders/techcrunch.py</span>
+
+<span class="token keyword">import</span> scrapy
+<span class="token keyword">import</span> re
+
+
+<span class="token keyword">class</span> <span class="token class-name">TechcrunchSpider</span><span class="token punctuation">(</span>scrapy<span class="token punctuation">.</span>Spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># ...</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> limit_pages<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token builtin">super</span><span class="token punctuation">(</span>TechcrunchSpider<span class="token punctuation">,</span> self<span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> limit_pages <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>limit_pages <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>limit_pages<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            self<span class="token punctuation">.</span>limit_pages <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">def</span> <span class="token function">parse</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment"># ...</span>
+        <span class="token keyword">if</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".load-more"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            next_page_url <span class="token operator">=</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".load-more::attr(href)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token comment"># urls look like https://techcrunch.com/page/4/</span>
+            <span class="token keyword">match</span> <span class="token operator">=</span> re<span class="token punctuation">.</span><span class="token keyword">match</span><span class="token punctuation">(</span><span class="token string">r".*\/page\/(\d+)\/"</span><span class="token punctuation">,</span> next_page_url<span class="token punctuation">)</span>
+            next_page_number <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span><span class="token keyword">match</span><span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> next_page_number <span class="token operator">&lt;=</span> self<span class="token punctuation">.</span>limit_pages<span class="token punctuation">:</span>
+                <span class="token keyword">yield</span> scrapy<span class="token punctuation">.</span>Request<span class="token punctuation">(</span>next_page_url<span class="token punctuation">)</span>
+    <span class="token comment"># ...</span></code></pre>
+<p>In the constructor, we allow passing a new kwarg called limit_pages, which we cast to an integer.
+In the <code>parse</code> method, we extract the next page number thanks to a regex on the url. Then we compare it to the <code>limit_pages</code> argument, and only if it's below, we enqueue the next page request.</p>
+<p>You can now run the spider safely with:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">scrapy crawl techcrunch <span class="token parameter variable">-a</span> <span class="token assign-left variable">limit_pages</span><span class="token operator">=</span><span class="token number">2</span></code></pre>
+<h2 id="scrape-the-post-pages" tabindex="-1">Scrape the post pages <a class="header-anchor" href="#scrape-the-post-pages">#</a></h2>
+<p>So far, we have left the <code>scrape_post</code> request empty, so our spider is not actually scraping anything.
+Here is what post pages look like (again, without JS):</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/Bynikwn-dI-789.avif 789w"><source type="image/webp" srcset="/eleventy-base-blog/img/Bynikwn-dI-789.webp 789w"><img alt="a Techcrunch post page" loading="lazy" decoding="async" src="/eleventy-base-blog/img/Bynikwn-dI-789.png" width="789" height="948"></picture></p>
+<p>Before writing the scraper method, we need to declare the items that we are going to scrape:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># items.py</span>
+<span class="token keyword">import</span> scrapy
+
+<span class="token keyword">class</span> <span class="token class-name">BlogPost</span><span class="token punctuation">(</span>scrapy<span class="token punctuation">.</span>Item<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    url <span class="token operator">=</span> scrapy<span class="token punctuation">.</span>Field<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    title <span class="token operator">=</span> scrapy<span class="token punctuation">.</span>Field<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    author <span class="token operator">=</span> scrapy<span class="token punctuation">.</span>Field<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    content <span class="token operator">=</span> scrapy<span class="token punctuation">.</span>Field<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    published_at <span class="token operator">=</span> scrapy<span class="token punctuation">.</span>Field<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p><em>Note: There is now a <a href="https://stackoverflow.com/a/5077350">simple way</a> to have a dynamic schema without manually declaring all the fields.
+I will show how to use it in a next article</em></p>
+<p>You can open a new Scrapy shell to play around on any post page and figure out the selectors you are going to use.
+For example:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">scrapy shell https://techcrunch.com/2017/05/01/awesomeness-is-launching-a-news-division-aimed-at-gen-z/</code></pre>
+<p>And once you have figured them out, you can write the scraper's missing method:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># spiders/techcrunch.py</span>
+
+<span class="token keyword">from</span> tc_scraper<span class="token punctuation">.</span>items <span class="token keyword">import</span> BlogPost
+<span class="token keyword">import</span> datetime
+
+
+<span class="token keyword">class</span> <span class="token class-name">TechcrunchSpider</span><span class="token punctuation">(</span>scrapy<span class="token punctuation">.</span>Spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    <span class="token comment"># ...</span>
+
+    <span class="token keyword">def</span> <span class="token function">parse_post</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        item <span class="token operator">=</span> BlogPost<span class="token punctuation">(</span>
+            title<span class="token operator">=</span>response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">"h1::text"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            author<span class="token operator">=</span>response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".article__byline>a::text"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            published_at<span class="token operator">=</span>self<span class="token punctuation">.</span>extract_post_date<span class="token punctuation">(</span>response<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            content<span class="token operator">=</span>self<span class="token punctuation">.</span>extract_content<span class="token punctuation">(</span>response<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            url<span class="token operator">=</span>response<span class="token punctuation">.</span>url
+        <span class="token punctuation">)</span>
+        <span class="token keyword">yield</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">extract_post_date</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        date_text <span class="token operator">=</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">"meta[name='sailthru.date']::attr(content)"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract_first<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> datetime<span class="token punctuation">.</span>datetime<span class="token punctuation">.</span>strptime<span class="token punctuation">(</span>date_text<span class="token punctuation">,</span> <span class="token string">"%Y-%m-%d %H:%M:%S"</span> <span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">extract_content</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        paragraphs_texts <span class="token operator">=</span> <span class="token punctuation">[</span>
+        p<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">" ::text"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>extract<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">for</span> p <span class="token keyword">in</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".article-content>p"</span><span class="token punctuation">)</span>
+        <span class="token punctuation">]</span>
+        paragraphs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> paragraphs_texts<span class="token punctuation">]</span>
+        paragraphs <span class="token operator">=</span> <span class="token punctuation">[</span>re<span class="token punctuation">.</span>subn<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token keyword">for</span> p <span class="token keyword">in</span> paragraphs<span class="token punctuation">]</span>
+        paragraphs <span class="token operator">=</span> <span class="token punctuation">[</span>p <span class="token keyword">for</span> p <span class="token keyword">in</span> paragraphs <span class="token keyword">if</span> p<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token string">""</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> <span class="token string">"\n\n"</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>paragraphs<span class="token punctuation">)</span></code></pre>
+<p>So what's going here?</p>
+<ul>
+<li>We instanciate a <code>BlogPost</code> item that we then yield, that's the Scrapy way.</li>
+<li>Most of the fields are straightforward, so we write their selectors inline.
+Some others are more complicated so we have extracted them to independent methods.</li>
+<li>The <code>published_at</code> field is a bit tricky because in the visible DOM there is no plain text datetime, only a vague 'X hours/days ago'.
+If you inspect the DOM closely, you will find this meta <code>sailthru.date</code> that is easy to use and parse.</li>
+<li>The <code>extract_content</code> method is quite involved, but it's really not key to this article's objective.
+We are basically joining the texts from the different paragraphs in a way that's human readable.
+Because the content is actually HTML, we are losing some infos in the process, like the links and images.</li>
+</ul>
+<p>You can now run the spider with:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">scrapy crawl techcrunch <span class="token parameter variable">-a</span> <span class="token assign-left variable">limit_pages</span><span class="token operator">=</span><span class="token number">2</span> <span class="token parameter variable">-o</span> posts.json</code></pre>
+<p>and Scrapy will generate a nice <code>posts.json</code> file with all the scraped items. Yay!</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/jRoOTRr7Mi-1252.avif 1252w"><source type="image/webp" srcset="/eleventy-base-blog/img/jRoOTRr7Mi-1252.webp 1252w"><img alt="display posts.json contents" loading="lazy" decoding="async" src="/eleventy-base-blog/img/jRoOTRr7Mi-1252.png" width="1252" height="1190"></picture></p>
+<h1 id="incremental-scraping" tabindex="-1"><a name="incremental"></a>Incremental Scraping <a class="header-anchor" href="#incremental-scraping">#</a></h1>
+<h2 id="store-items-in-mongodb" tabindex="-1">Store items in MongoDB <a class="header-anchor" href="#store-items-in-mongodb">#</a></h2>
+<p>So in the last step we exported the items to a JSON file.
+For long term storage and re-use, it's more convenient to use a database.
+We will use MongoDB here, but you could use a regular SQL database too.
+I personally find it convenient on scraping projects to use a NoSQL database because of the frequent schema changes, especially as you initially iterate on the scraper.</p>
+<p>If you are on Mac OS X, these commands will install MongoDB server and start it as a service:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">brew <span class="token function">install</span> mongodb
+brew services start mongodb</code></pre>
+<p>We are going to create a Scrapy pipeline so that each yielded item will get saved to MongoDB.
+This process is well documented in <a href="https://doc.scrapy.org/en/latest/topics/item-pipeline.html?highlight=mongo#write-items-to-mongodb">Scrapy's docs</a>.</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># pipelines.py</span>
+
+<span class="token keyword">import</span> pymongo
+
+
+<span class="token keyword">class</span> <span class="token class-name">MongoPipeline</span><span class="token punctuation">(</span><span class="token builtin">object</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    collection_name <span class="token operator">=</span> <span class="token string">'tc_posts'</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> mongo_uri<span class="token punctuation">,</span> mongo_db<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>mongo_uri <span class="token operator">=</span> mongo_uri
+        self<span class="token punctuation">.</span>mongo_db <span class="token operator">=</span> mongo_db
+
+    <span class="token decorator annotation punctuation">@classmethod</span>
+    <span class="token keyword">def</span> <span class="token function">from_crawler</span><span class="token punctuation">(</span>cls<span class="token punctuation">,</span> crawler<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> cls<span class="token punctuation">(</span>
+            mongo_uri<span class="token operator">=</span>crawler<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'MONGO_URI'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            mongo_db<span class="token operator">=</span>crawler<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'MONGO_DATABASE'</span><span class="token punctuation">,</span> <span class="token string">'tc_scraper'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">open_spider</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client <span class="token operator">=</span> pymongo<span class="token punctuation">.</span>MongoClient<span class="token punctuation">(</span>self<span class="token punctuation">.</span>mongo_uri<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>db <span class="token operator">=</span> self<span class="token punctuation">.</span>client<span class="token punctuation">[</span>self<span class="token punctuation">.</span>mongo_db<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">close_spider</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">process_item</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> item<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>db<span class="token punctuation">[</span>self<span class="token punctuation">.</span>collection_name<span class="token punctuation">]</span><span class="token punctuation">.</span>insert_one<span class="token punctuation">(</span><span class="token builtin">dict</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> item</code></pre>
+<p>and activate it in the settings:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># settings.py</span>
+
+ITEM_PIPELINES <span class="token operator">=</span> <span class="token punctuation">{</span>
+   <span class="token string">'tc_scraper.pipelines.MongoPipeline'</span><span class="token punctuation">:</span> <span class="token number">300</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Last step is to install the new <code>pymongo</code> dependency:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">pip3 <span class="token function">install</span> pymongo</code></pre>
+<p>You can now re-run the spider:</p>
+<pre><code>scrapy crawl techcrunch -a limit_pages=2
+</code></pre>
+<p>Feel free to open a mongo shell and check that the items were indeed inserted:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">mongo localhost/tc_scraper
+<span class="token operator">></span> db.tc_posts.count<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token number">40</span>
+<span class="token operator">></span> db.tc_posts.<span class="token function-name function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+	<span class="token string">"_id"</span><span class="token builtin class-name">:</span> ObjectId<span class="token punctuation">(</span><span class="token string">"5c09294a7fa9c70f84e43322"</span><span class="token punctuation">)</span>,
+	<span class="token string">"url"</span><span class="token builtin class-name">:</span> <span class="token string">"https://techcrunch.com/2018/12/06/looker-looks-to-future-with-103m-investment-on-1-6b-valuation/"</span>,
+	<span class="token string">"author"</span><span class="token builtin class-name">:</span> <span class="token string">"Ron Miller"</span>,
+
+  <span class="token punctuation">..</span>.</code></pre>
+<h2 id="update-existing-items" tabindex="-1">Update existing items <a class="header-anchor" href="#update-existing-items">#</a></h2>
+<p>If you run the spider again, you will notice that you now have 80 items in your database.
+Let's update the Pipeline so that it does not insert a new post each time, but rather updates the existing one if it already exists.</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># pipelines.py</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">def</span> <span class="token function">process_item</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> item<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>db<span class="token punctuation">[</span>self<span class="token punctuation">.</span>collection_name<span class="token punctuation">]</span><span class="token punctuation">.</span>find_one_and_update<span class="token punctuation">(</span>
+            <span class="token punctuation">{</span><span class="token string">"url"</span><span class="token punctuation">:</span> item<span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span><span class="token string">"$set"</span><span class="token punctuation">:</span> <span class="token builtin">dict</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            upsert<span class="token operator">=</span><span class="token boolean">True</span>
+        <span class="token punctuation">)</span>
+        <span class="token keyword">return</span> item</code></pre>
+<p>Here we are using the url as the key, because unfortunately there does not seem to be a more canonical ID in the DOM.
+It should work as long as Techcrunch does not change their posts slugs or published dates often.</p>
+<p>You can drop all items and re-run the spider twice:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token builtin class-name">echo</span> <span class="token string">"db.tc_posts.drop();"</span> <span class="token operator">|</span> mongo localhost/tc_scraper
+scrapy crawl techcrunch <span class="token parameter variable">-a</span> <span class="token assign-left variable">limit_pages</span><span class="token operator">=</span><span class="token number">2</span>
+scrapy crawl techcrunch <span class="token parameter variable">-a</span> <span class="token assign-left variable">limit_pages</span><span class="token operator">=</span><span class="token number">2</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"db.tc_posts.count();"</span> <span class="token operator">|</span> mongo localhost/tc_scraper</code></pre>
+<p>You should now have only 40 items in the database.</p>
+<p><em>Note: If you are scared about running so many requests against Techcrunch.com, be aware that by default, Scrapy will use a <a href="https://doc.scrapy.org/en/latest/topics/downloader-middleware.html#module-scrapy.downloadermiddlewares.httpcache">cache</a>.
+For most requests, it will not re-run them every single time, but instead re-use the previous response</em></p>
+<h2 id="limit-crawls-to-new-items" tabindex="-1">Limit crawls to new items <a class="header-anchor" href="#limit-crawls-to-new-items">#</a></h2>
+<p>So far our solution is almost complete, but it will re-scrape all items every time you start it.
+In this step, we will make sure that we don't re-scrape items uselessly, in order to have faster scraping sessions, and to limit our requests rate to the website.</p>
+<p>What we will do is to update the spider so that it prevents requests to items that were already scraped before and are in the database.</p>
+<p>First let's extract the MongoDB connection logic from the pipeline in order to re-use it in the spider:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># mongo_provider.py (new file)</span>
+
+<span class="token keyword">import</span> pymongo
+
+
+<span class="token keyword">class</span> <span class="token class-name">MongoProvider</span><span class="token punctuation">(</span><span class="token builtin">object</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    collection_name <span class="token operator">=</span> <span class="token string">'tc_posts'</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> uri<span class="token punctuation">,</span> database<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>mongo_uri <span class="token operator">=</span> uri
+        self<span class="token punctuation">.</span>mongo_db <span class="token operator">=</span> database <span class="token keyword">or</span> <span class="token string">'tc_scraper'</span>
+
+    <span class="token keyword">def</span> <span class="token function">get_collection</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client <span class="token operator">=</span> pymongo<span class="token punctuation">.</span>MongoClient<span class="token punctuation">(</span>self<span class="token punctuation">.</span>mongo_uri<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>client<span class="token punctuation">[</span>self<span class="token punctuation">.</span>mongo_db<span class="token punctuation">]</span><span class="token punctuation">[</span>self<span class="token punctuation">.</span>collection_name<span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">close_connection</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>client<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>and update the pipeline accordingly:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># pipelines.py</span>
+
+<span class="token keyword">from</span> tc_scraper<span class="token punctuation">.</span>mongo_provider <span class="token keyword">import</span> MongoProvider
+
+
+<span class="token keyword">class</span> <span class="token class-name">MongoPipeline</span><span class="token punctuation">(</span><span class="token builtin">object</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> settings<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>mongo_provider <span class="token operator">=</span> MongoProvider<span class="token punctuation">(</span>
+            settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'MONGO_URI'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'MONGO_DATABASE'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+
+    <span class="token decorator annotation punctuation">@classmethod</span>
+    <span class="token keyword">def</span> <span class="token function">from_crawler</span><span class="token punctuation">(</span>cls<span class="token punctuation">,</span> crawler<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> cls<span class="token punctuation">(</span>crawler<span class="token punctuation">.</span>settings<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">open_spider</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>collection <span class="token operator">=</span> self<span class="token punctuation">.</span>mongo_provider<span class="token punctuation">.</span>get_collection<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">close_spider</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>mongo_provider<span class="token punctuation">.</span>close_connection<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">process_item</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> item<span class="token punctuation">,</span> spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>collection<span class="token punctuation">.</span>find_one_and_update<span class="token punctuation">(</span>
+            <span class="token punctuation">{</span><span class="token string">"url"</span><span class="token punctuation">:</span> item<span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span><span class="token string">"$set"</span><span class="token punctuation">:</span> <span class="token builtin">dict</span><span class="token punctuation">(</span>item<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+            upsert<span class="token operator">=</span><span class="token boolean">True</span>
+        <span class="token punctuation">)</span>
+        <span class="token keyword">return</span> item</code></pre>
+<p><em>You can re-run the scraper at this checkpoint, nothing should have changed</em></p>
+<p>We can now update the spider so that it uses this mongo provider:</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># spiders/techcrunch.py</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">from</span> tc_scraper<span class="token punctuation">.</span>mongo_provider <span class="token keyword">import</span> MongoProvider
+
+
+<span class="token keyword">class</span> <span class="token class-name">TechcrunchSpider</span><span class="token punctuation">(</span>scrapy<span class="token punctuation">.</span>Spider<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token decorator annotation punctuation">@classmethod</span>
+    <span class="token keyword">def</span> <span class="token function">from_crawler</span><span class="token punctuation">(</span>cls<span class="token punctuation">,</span> crawler<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        kwargs<span class="token punctuation">[</span><span class="token string">'mongo_uri'</span><span class="token punctuation">]</span> <span class="token operator">=</span> crawler<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"MONGO_URI"</span><span class="token punctuation">)</span>
+        kwargs<span class="token punctuation">[</span><span class="token string">'mongo_database'</span><span class="token punctuation">]</span> <span class="token operator">=</span> crawler<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'MONGO_DATABASE'</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token builtin">super</span><span class="token punctuation">(</span>TechcrunchSpider<span class="token punctuation">,</span> cls<span class="token punctuation">)</span><span class="token punctuation">.</span>from_crawler<span class="token punctuation">(</span>crawler<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> limit_pages<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> mongo_uri<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> mongo_database<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        self<span class="token punctuation">.</span>mongo_provider <span class="token operator">=</span> MongoProvider<span class="token punctuation">(</span>mongo_uri<span class="token punctuation">,</span> mongo_database<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>collection <span class="token operator">=</span> self<span class="token punctuation">.</span>mongo_provider<span class="token punctuation">.</span>get_collection<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        last_items <span class="token operator">=</span> self<span class="token punctuation">.</span>collection<span class="token punctuation">.</span>find<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>sort<span class="token punctuation">(</span><span class="token string">"published_at"</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span>limit<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>last_scraped_url <span class="token operator">=</span> last_items<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span> <span class="token keyword">if</span> last_items<span class="token punctuation">.</span>count<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token boolean">None</span>
+
+    <span class="token keyword">def</span> <span class="token function">parse</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">for</span> post <span class="token keyword">in</span> response<span class="token punctuation">.</span>css<span class="token punctuation">(</span><span class="token string">".post-block"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token keyword">if</span> url <span class="token operator">==</span> self<span class="token punctuation">.</span>last_scraped_url<span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"reached last item scraped, breaking loop"</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                <span class="token keyword">yield</span> scrapy<span class="token punctuation">.</span>Request<span class="token punctuation">(</span>url<span class="token punctuation">,</span> callback<span class="token operator">=</span>self<span class="token punctuation">.</span>parse_post<span class="token punctuation">)</span></code></pre>
+<p>Here is a quick breakdown of what we are doing here:</p>
+<ul>
+<li>In order to use the spider's settings that contain the mongo credentials, we need to do override this <code>from_crawler</code> method. It's quite verbose, and not very intuitive. I agree it's annoying.</li>
+<li>We then use these settings in the constructor to initialize a MongoDB connection thanks to our new <code>MongoProvider</code> class.</li>
+<li>We query Mongo for the last scraped item and store it's url.
+Here we are sorting the posts on the <code>published_at</code> descendingly, we made sure that this is consistent with Techcrunch's sorting, or else our algorithm would not work properly.</li>
+<li>In the parsing loop, we break and stop the scraping as soon as we reach a post with this url.
+We do it by preventing yielding the request, and breaking from the loop.</li>
+</ul>
+<p>You can now perform a few tests, drop some of the last items from MongoDB and re-scrape, you will see that it only scrapes the missing items and stops. Success!</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">mongo localhost/tc_scraper
+<span class="token operator">></span> last_item <span class="token operator">=</span> db.tc_posts.find<span class="token punctuation">(</span><span class="token punctuation">)</span>.sort<span class="token punctuation">(</span><span class="token punctuation">{</span>published_at: -1<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+<span class="token operator">></span> db.tc_posts.remove<span class="token punctuation">(</span><span class="token punctuation">{</span>_id: last_item<span class="token punctuation">[</span><span class="token string">"_id"</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token operator">></span> <span class="token builtin class-name">exit</span>
+scrapy crawl techcrunch <span class="token parameter variable">-a</span> <span class="token assign-left variable">limit_pages</span><span class="token operator">=</span><span class="token number">2</span></code></pre>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>We now have a scraper that will do the least amount of work possible on each new run. I hope you enjoyed this tutorial, and that this gave you new ideas for scraping projects!</p>
+<p>You can find the full code for this project here on GitHub: <a href="https://github.com/adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb">adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb</a>.</p>
+<p>You can deploy your spider to <a href="https://scrapinghub.com/scrapy-cloud">ScrapingHub cloud</a>, and schedule it to run daily on their servers.
+I'm not affiliated to them in any way, it's just an awesome product and their free plan already does a lot.
+By the way, ScrapingHub is the main contributor to the fully open-source Scrapy project that we just used.</p>
+<p>To go further, you can implement a new <code>force_rescrape</code> argument, that will bypass our limit and force going through all the items again.
+This could be useful if you update the <code>scrape_post</code> method, or if Techcrunch changes their DOM structure.</p>
+<p>Let me know if you use this technique in one of your projects!</p>
+<p><a href="https://news.ycombinator.com/item?id=18697956">Discuss on Hacker News</a></p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/">Échelle des revenus en France</a></li><li>Next: <a href="/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/">Build and deploy huge static websites with Caddy</a></li>
+</ul>
+
+		</main>
+
+		<footer>
+			<nav class="links">
+				<a href="https://github.com/adipasquale">
+					<svg width="100" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>GitHub</title>
+						<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+					</svg>
+					<div>GitHub</div>
+				</a>
+				<a href="mailto:adrien@dipasquale.fr">
+					<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>Mail</title>
+						<path d="M15.61 12c0 1.99-1.62 3.61-3.61 3.61-1.99 0-3.61-1.62-3.61-3.61 0-1.99 1.62-3.61 3.61-3.61 1.99 0 3.61 1.62 3.61 3.61M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12c2.424 0 4.761-.722 6.76-2.087l.034-.024-1.617-1.879-.027.017A9.494 9.494 0 0 1 12 21.54c-5.26 0-9.54-4.28-9.54-9.54 0-5.26 4.28-9.54 9.54-9.54 5.26 0 9.54 4.28 9.54 9.54a9.63 9.63 0 0 1-.225 2.05c-.301 1.239-1.169 1.618-1.82 1.568-.654-.053-1.42-.52-1.426-1.661V12A6.076 6.076 0 0 0 12 5.93 6.076 6.076 0 0 0 5.93 12 6.076 6.076 0 0 0 12 18.07a6.02 6.02 0 0 0 4.3-1.792 3.9 3.9 0 0 0 3.32 1.805c.874 0 1.74-.292 2.437-.821.719-.547 1.256-1.336 1.553-2.285.047-.154.135-.504.135-.507l.002-.013c.175-.76.253-1.52.253-2.457 0-6.617-5.383-12-12-12"></path>
+					</svg>
+					<div>mail adrien@dipasquale.fr</div>
+				</a>
+				<a href="https://ruby.social/@adrien">
+					<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+						<path clip-rule="evenodd" d="m2004.3 228h-.57c-19.87.163-38.97 2.491-50.13 7.601-.5.213-24.58 10.78-24.58 46.99 0 7.394-.14 16.236.09 25.612.4 16.438 2 32.742 7.21 45.957 5.67 14.406 15.47 25.335 32.04 29.72 14.11 3.737 26.23 4.503 35.99 3.967h.01c18.41-1.021 28.71-6.695 28.71-6.695a6.018 6.018 0 0 0 3.16-5.558l-.56-12.178a5.984 5.984 0 0 0 -2.56-4.646 5.995 5.995 0 0 0 -5.24-.804s-11.04 3.471-23.45 3.047c-4.87-.167-9.84-.357-14.18-1.544-3.91-1.069-7.14-3.148-8.76-7.347 5.59.951 13.45 2.021 22.27 2.425 10.49.481 20.33-.592 30.33-1.785 12.37-1.477 23.76-6.688 31.4-13.091 5.8-4.865 9.47-10.509 10.5-15.801v-.001c3.23-16.623 3.05-40.428 3.04-41.319-.01-36.286-24.23-46.801-24.58-46.951-11.14-5.105-30.25-7.436-50.14-7.599zm59.9 93.58.09-.471c3.1-15.948 2.73-38.451 2.73-38.451v-.067c0-27.633-17.49-36.04-17.49-36.04-.01-.008-.03-.016-.05-.024-10.05-4.616-27.33-6.379-45.26-6.527h-.41c-17.93.148-35.2 1.911-45.25 6.527l-.06.024s-17.48 8.407-17.48 36.04c0 7.308-.15 16.047.09 25.314v.004c.36 14.96 1.64 29.826 6.37 41.852 4.27 10.836 11.49 19.221 23.95 22.519 12.65 3.349 23.51 4.066 32.26 3.585 9.61-.533 16.56-2.512 20.36-3.891l-.04-.739c-5.11 1.018-12.33 2.033-20 1.771-16.29-.559-32.69-3.029-35.34-23.016a40.2 40.2 0 0 1 -.35-5.4 6 6 0 0 1 2.3-4.719 5.998 5.998 0 0 1 5.13-1.109s12.59 3.066 28.55 3.798c9.81.45 19.01-.598 28.36-1.713 9.88-1.18 19.01-5.258 25.11-10.372 3.36-2.814 5.83-5.834 6.43-8.895zm-54.2-36.244c.68-2.603 3.99-12.807 14.27-12.807 10.68 0 10.54 12.137 10.54 12.137v34.224c0 3.311 2.69 6 6 6s6-2.689 6-6v-34.406s-.68-23.955-22.54-23.955c-10 0-16.43 5.292-20.4 10.778-4.07-5.273-10.62-10.293-20.78-10.293-6.92 0-11.53 2.138-14.68 4.857-6.67 5.747-6.86 14.826-6.81 16.949l.02.455s-.01-.161-.02-.455v-.052 36.342c0 3.311 2.69 6 6 6s6-2.689 6-6v-36.342c0-.169-.01-.338-.02-.507 0 0-.5-4.577 2.66-7.298 1.45-1.252 3.66-1.949 6.85-1.949 10.65 0 14.18 9.844 14.91 12.386v20.233c0 3.311 2.69 6 6 6s6-2.689 6-6z" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" transform="translate(-1908 -212)"></path>
+					</svg>
+
+					<div>Mastodon</div>
+				</a>
+			</nav>
+
+			<p style="margin-top:2rem;">
+				<small>
+					built with <a href="https://www.11ty.dev/">Eleventy</a> & <a href="https://newcss.net/">new.css</a>
+					·
+					hosted on
+					<a href="https://github.com/adipasquale/adipasquale.github.com">GitHub Pages</a>
+					·
+					last update 2024-03
+				</small>
+			</p>
+
+		</footer>
+
+		<!-- Current page: /eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/ -->
+	</body>
+</html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2013-02-20-capistrano-environment-variables/</loc>
+		<lastmod>2013-02-20</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2017-03-13-taskqueues-tips/</loc>
+		<lastmod>2017-03-13</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2017-06-26-designing-state-machines/</loc>
+		<lastmod>2017-06-26</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/</loc>
+		<lastmod>2018-12-02</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/</loc>
+		<lastmod>2018-12-07</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/</loc>
+		<lastmod>2018-12-17</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/</loc>
+		<lastmod>2018-12-27</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/</loc>
+		<lastmod>2019-02-28</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/</loc>
+		<lastmod>2019-12-10</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/blog/</loc>
+		<lastmod>2024-03-16</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/</loc>
+		<lastmod>2024-03-16</lastmod>
+	</url>
+	
+	<url>
+		<loc>https://www.dipasquale.fr/eleventy-base-blog/pianopiano/</loc>
+		<lastmod>2024-03-16</lastmod>
+	</url>
+</urlset>

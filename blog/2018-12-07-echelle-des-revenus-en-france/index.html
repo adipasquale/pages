@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Échelle des revenus en France</title>
+		<meta name="description" content="Adrien Di Paquale personal website">
+
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Adrien">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Adrien">
+		<meta name="generator" content="Eleventy v2.0.1">
+
+		<link rel="stylesheet" href="/eleventy-base-blog/css/new.css">
+		<link rel="stylesheet" href="/eleventy-base-blog/css/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="#skip" class="visually-hidden">Skip to main content</a>
+			<h1>Adrien</h1>
+			<h2 class="visually-hidden">Menu</h2>
+			<nav>
+					<a href="/eleventy-base-blog/">
+						Home
+					</a>
+					<a href="/eleventy-base-blog/blog/">
+						Blog
+					</a>
+					<a href="/eleventy-base-blog/pianopiano/">
+						Piano Piano
+					</a>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+
+<link rel="stylesheet" href="/eleventy-base-blog/css/prism-okaidia.css">
+
+<h1>Échelle des revenus en France</h1>
+
+<p>
+	<time datetime="2018-12-07">
+		07 December 2018
+	</time>
+</p>
+
+<hr>
+
+
+
+<ul>
+<li>Édité le 25/12/2018 : <a href="https://github.com/adipasquale/blog.dipasquale.fr/commit/4b3ca1f50debad7aa1d71d3bcbe7c9dd1197ba51"><em>remarques de @Paul_Puget sur les interprétations</em></a></li>
+</ul>
+<p>Je me suis intéressé à tracer le graphique de l'échelle des revenus en France.
+L'idée est de pouvoir dire &quot;si vous vivez avec tant d'argent, vous êtes mieux loti que X% des français&quot;.</p>
+<p>C'est une statistique qui m'intéresse particulièrement car elle est simple à comprendre et permet de prendre du recul.
+En l'occurence, cela peut permettre de mieux comprendre la contestation des &quot;gilets jaunes&quot;.</p>
+<h1 id="resultats" tabindex="-1">Résultats <a class="header-anchor" href="#resultats">#</a></h1>
+<p>Avant toute chose, voici le résultat de mes analyses :</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/IH67siQeIL-544.avif 544w"><source type="image/webp" srcset="/eleventy-base-blog/img/IH67siQeIL-544.webp 544w"><img alt="Revenus disponibles mensuels par unité de consommation" loading="lazy" decoding="async" src="/eleventy-base-blog/img/IH67siQeIL-544.png" width="544" height="495"></picture></p>
+<p>De manière simplificatrice, on peut lire ce graphique comme cela : <strong>&quot;si vous vivez avec 2500 euros par mois, vous êtes mieux loti que 80% des français&quot;</strong>.
+<em>Note : c'est un langage approximatif</em>.</p>
+<p>Pour être précis, il faut bien préciser les termes employés ici. Voici les définitions de l'INSEE :</p>
+<blockquote>
+<p>Le <a href="https://www.insee.fr/fr/metadonnees/definition/c1458">revenu disponible</a> d'un ménage comprend les revenus d'activité (nets des cotisations sociales), les revenus du patrimoine, les transferts en provenance d'autres ménages et les prestations sociales (y compris les pensions de retraite et les indemnités de chômage), nets des impôts directs.</p>
+</blockquote>
+<blockquote>
+<p><a href="https://www.insee.fr/fr/metadonnees/definition/c1802">L'unité de consommation</a> est un Système de pondération attribuant un coefficient à chaque membre du ménage et permettant de comparer les niveaux de vie de ménages de tailles ou de compositions différentes. Avec cette pondération, le nombre de personnes est ramené à un nombre d'unités de consommation (UC).
+Pour comparer le niveau de vie des ménages, on ne peut s'en tenir à la consommation par personne. En effet, les besoins d'un ménage ne s'accroissent pas en stricte proportion de sa taille. Lorsque plusieurs personnes vivent ensemble, il n'est pas nécessaire de multiplier tous les biens de consommation (en particulier, les biens de consommation durables) par le nombre de personnes pour garder le même niveau de vie.
+Aussi, pour comparer les niveaux de vie de ménages de taille ou de composition différente, on utilise une mesure du revenu corrigé par unité de consommation à l'aide d'une échelle d'équivalence. L'échelle actuellement la plus utilisée (dite de l'OCDE) retient la pondération suivante :</p>
+<ul>
+<li>1 UC pour le premier adulte du ménage ;</li>
+<li>0,5 UC pour les autres personnes de 14 ans ou plus ;</li>
+<li>0,3 UC pour les enfants de moins de 14 ans.</li>
+</ul>
+</blockquote>
+<p>Donc, <em>en gros</em>, on parle ici de <strong>l'argent effectivement disponible dans chaque famille divisé par le nombre de personnes de manière dégressive</strong> (toutes sources confondues et après impôts).</p>
+<p>Les données utilisées proviennent de <a href="https://www.insee.fr/fr/statistiques/3560118">ce dossier</a> de l'INSEE paru le 19/06/2018 analysant des données de 2015 (plus de détails ci-dessous).</p>
+<p><em>Vous trouverez des graphiques à d'autres échelles géographiques à la <a href="#regions">fin de l'article</a>.</em></p>
+<h1 id="construction-de-l-analyse" tabindex="-1">Construction de l'analyse <a class="header-anchor" href="#construction-de-l-analyse">#</a></h1>
+<h2 id="recherche-des-donnees" tabindex="-1">Recherche des données <a class="header-anchor" href="#recherche-des-donnees">#</a></h2>
+<p>Je me suis d'abord rendu sur <a href="https://www.data.gouv.fr/">Data Gouv</a> et j'ai cherché avec des mots-clés comme &quot;revenu médian&quot;.
+J'ai vite constaté que les résultats sont bien moins évidents que ce que j'espérais, avec parfois un langage abscons.
+De plus, les liens pointant vers des données de l'INSEE sont en partie cassés et redirigent vers la page d'accueil.</p>
+<p>Je me suis donc déplacé sur le site de l'INSEE pour mes recherches.
+C'est très compliqué de comprendre où chercher les informations sur ce grand site au vocabulaire nouveau pour moi.
+Il y a pléthore de documents, de fiches, de données, regroupées sous des noms d'enquêtes très larges.
+Très dur de savoir vers quoi chercher.
+J'ai alors utilisé mon joker à un ami et <a href="https://twitter.com/AntoineAugusti">@AntoineAugusti</a> m'a conseillé de ne pas hésiter à écrire à l'INSEE pour qu'ils m'aiguillent.</p>
+<p>J'ai donc envoyé un message depuis le formulaire de contact et j'ai effectivement reçu une réponse très efficace sous quelques jours :</p>
+<blockquote>
+<p>Bonjour,</p>
+<p>Vous trouverez la ventilation des revenus disponibles par commune,sous la rubrique Statistique, en sélectionnant les critères suivants :
+thèmes : Revenus – Pouvoir d'achat – Consommation &gt; Revenus – Niveaux de vie – Pouvoir d'achat
+catégories : Données &gt; Bases de données</p>
+<p>Les données sont accessibles sur la page <a href="https://www.insee.fr/fr/statistiques/3560118">Structure et distribution des revenus, inégalité des niveaux de vie en 2015</a>, puis dans le fichier &quot;Base niveau communes en 2015 - y compris arrondissements municipaux&quot;. Vous devez ensuite choisir le fichier &quot;FILO_DISP_COM.xls&quot;. La distribution par décile se situe dans l'onglet &quot;ensemble&quot;.</p>
+</blockquote>
+<p>Cette réponse a été quasiment parfaite pour mon usage et m'a débloqué pour la suite !</p>
+<h2 id="retour-sur-la-recherche-de-donnees" tabindex="-1">Retour sur la recherche de données <a class="header-anchor" href="#retour-sur-la-recherche-de-donnees">#</a></h2>
+<p>Mon sentiment sur cette recherche de données est partagé.</p>
+<p>D'un côté je suis ébahi par la quantité et la qualité des données accessibles librement.
+Et aussi par la réponse parfaite dans un temps raisonnable de l'INSEE à une demande d'un particulier.</p>
+<p>D'un autre côté, je trouve ça dommage d'avoir à faire une demande de support pour une recherche de statistique qui me paraît relativement &quot;basique&quot;.
+L'expérience aurait été bien meilleure si j'avais réussi à trouver moi-même ce que je cherchais.
+C'est dommage que l'intégration de Data Gouv avec l'INSEE ne fonctionne pas, et je pense que beaucoup de choses pourraient être faites pour améliorer la recherche et l'exploration au sein du site de l'INSEE. Ça m'a d'ailleurs donné l'idée d'ouvrir un site mirroir ... plus dans un autre post !</p>
+<p>Surtout, je pense que je n'aurais jamais envoyé un message de support à l'INSEE si mon ami qui connaît le milieu ne me l'avait suggéré.
+Je ne me serais pas senti légitime, et/ou je n'aurais jamais pensé recevoir une réponse aussi efficace rapidement.</p>
+<h2 id="construction-du-graphique" tabindex="-1">Construction du graphique <a class="header-anchor" href="#construction-du-graphique">#</a></h2>
+<p>Ça a été l'occasion pour moi de re-découvrir pandas, que je n'avais pas utilisé depuis longtemps.
+J'ai aussi pu utiliser Jupyter, le successeur de iPython Notebook, que je ne connaissais pas.</p>
+<p>La bonne surprise a été de voir que l'installation de cet environnement complet de stats (numpy, pandas, Jupyter ...) sur mon OS X s'est fait avec 3 commandes <code>pip3 install</code>, sans aucun problème. J'ai des souvenirs de cauchemards de dépendances ininstallables il y a quelques années.</p>
+<p>Dans un premier temps, j'ai travaillé sur le fichier indiqué par le support de l'INSEE qui contient les données à l'échelle communale. J'ai voulu faire une moyenne des déciles, avant de me rendre compte que c'était probablement une erreur statistique. J'ai alors pensé pondérer les moyennes avec la population de chaque commune. Intuitivement, impossible de me décider sur la validité d'une telle opération : <strong>est-ce qu'on peut découper un ensemble en sous-ensembles, calculer les déciles sur ces sous-ensembles, et en faire la moyenne pondérée pour retomber sur les déciles de l'ensemble global ?</strong>. Je n'ai pas trouvé la réponse sur internet, donc j'ai fait des simulations dans un autre notebook pour me faire une idée. Et ça n'a pas l'air valide, on ne retombe pas sur les mêmes valeurs ! vous pouvez jouer avec ce notebook de tests <a href="https://mybinder.org/v2/gh/adipasquale/france-income-disparities-2015/master?filepath=check%20weighted%20percentiles.ipynb">sur Binder</a> si ça vous intéresse.</p>
+<p>J'ai alors sorti le nez du guidon, pour me rendre compte qu'il y avait un jeu de données voisin à échelle plus haute, notamment à l'échelle nationale <code>FILO_DISP_METROPOLE.xls</code>. C'est beaucoup plus facile comme ça !</p>
+<p>Le reste est un &quot;jeu d'enfants&quot; qui m'a quand même pris quelques heures pour me rappeler comment manipuler les DataFrame et le plotting.</p>
+<p>Vous pouvez trouver le code source du Notebook Jupyter sur <a href="https://github.com/adipasquale/france-income-disparities-2015">GitHub</a>, et aussi en lancer une version interactive avec Binder <a href="https://mybinder.org/v2/gh/adipasquale/france-income-disparities-2015/master?filepath=revenus%20disponibles%20france%20metropolitaine%20-%20deciles.ipynb">en suivant ce lien</a>.</p>
+<h1 id="par-region-et-par-commune" tabindex="-1"><a name="regions"></a>Par région et par commune <a class="header-anchor" href="#par-region-et-par-commune">#</a></h1>
+<p>Dans les données disponibles, on a le détail à différentes échelles, dont l'échelle régionale et l'échelle communale.</p>
+<h2 id="par-region" tabindex="-1">Par région <a class="header-anchor" href="#par-region">#</a></h2>
+<p>Voici ce que ça donne région par région :</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/u42YsvgEBU-923.avif 923w"><source type="image/webp" srcset="/eleventy-base-blog/img/u42YsvgEBU-923.webp 923w"><img alt="Revenus disponibles mensuels par unité de consommation par région" loading="lazy" decoding="async" src="/eleventy-base-blog/img/u42YsvgEBU-923.png" width="923" height="710"></picture></p>
+<p>C'est un peu illisible, j'ai isolé de manière un peu arbitraire les extrêmes  :</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/8a3U-7Vqj7-644.avif 644w"><source type="image/webp" srcset="/eleventy-base-blog/img/8a3U-7Vqj7-644.webp 644w"><img alt="Revenus disponibles mensuels par unité de consommation par région, seulement les extrêmes" loading="lazy" decoding="async" src="/eleventy-base-blog/img/8a3U-7Vqj7-644.png" width="644" height="601"></picture></p>
+<p>On voit des différences de répartition importantes et surtout des inégalités de niveaux de vie très marquées.</p>
+<h2 id="au-sein-de-paris" tabindex="-1">Au sein de Paris <a class="header-anchor" href="#au-sein-de-paris">#</a></h2>
+<p>Ensuite, j'ai regardé à l'échelle des communes. On ne peut évidemment pas envisager de tracer le graphique pour les 36000 communes françaises et quelques, il faut donc faire des choix.</p>
+<p>J'ai d'abord regardé les différences entre les différents arrondissements de Paris. Avec 20 arrondissements, le graphique est illisible, le voici avec les 4 arrondissements ayant respectivement les 2 taux d'inégalités les plus forts et les plus faibles (mesurés par <a href="https://www.insee.fr/fr/metadonnees/definition/c1551">l'indice de Gini</a>).</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/brHZJXQAmW-554.avif 554w"><source type="image/webp" srcset="/eleventy-base-blog/img/brHZJXQAmW-554.webp 554w"><img alt="Revenus disponibles mensuels par unité de consommation par région" loading="lazy" decoding="async" src="/eleventy-base-blog/img/brHZJXQAmW-554.png" width="554" height="492"></picture></p>
+<p>Et non, ce n'est pas le 16ème qui a le plus haut taux d'inégalité, mais bien le 7ème ! (le 16ème est 3ème). Les différences sont extrèmement marquées avec les deux arrondissements à l'extrême opposé. On note que le 1er décile est quasiment identique : les ménages ayant le moins de revenu en ont à peu près autant dans le 7ème que dans le 20ème. Et on voit aussi de manière flagrante que <strong>les ménages ayant le plus de revenus en ont environ 3 fois plus à Paris 7ème qu'à Paris 20ème</strong>.</p>
+<p><strong>Mise à jour</strong>: <a href="https://twitter.com/Paul_Puget">@Paul_Puget</a> m'a fait remarquer que mon interprétation est erronée. On peut effectivement lire que le dernier décile est environ trois fois plus élevé. On ne peut cependant pas en tirer de conclusions sur les revenus moyens de ces 10% de gens les plus riches. Il n'est pas impossible que le revenu moyen dans ce dernier décile soit plus élevé dans le 20ème que dans le 7ème, cf <a href="https://imgur.com/a/adr4V8Y">ce petit schéma à la main</a>.</p>
+<h2 id="par-ville" tabindex="-1">Par ville <a class="header-anchor" href="#par-ville">#</a></h2>
+<p>Enfin j'ai regardé les communes à l'échelle nationale. J'ai filtré les données pour voir les grandes villes uniquement, en utilisant cette règle : &quot;nombre de personnes dans les ménages fiscaux supérieur à 100000&quot;.</p>
+<p>Voici un graphique représentant 5 villes choisies arbitrairement pour représenter la &quot;palette&quot; de répartition des revenus : Paris (taux d'inégalité le plus fort), Marseille, Brest (taux d'inégalité le plus faible), Toulouse et Lyon.</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/FtMHLDqUnQ-545.avif 545w"><source type="image/webp" srcset="/eleventy-base-blog/img/FtMHLDqUnQ-545.webp 545w"><img alt="Revenus disponibles mensuels par unité de consommation par communes" loading="lazy" decoding="async" src="/eleventy-base-blog/img/FtMHLDqUnQ-545.png" width="545" height="492"></picture></p>
+<p>Là encore, on voit un schéma similaire, c'est-à-dire que les écarts se produisent principalement dans les déciles les plus hauts. Je pense que l'on peut lire cela comme ça : <strong>&quot;Les écarts de répartitions des richesses dans les grandes villes françaises se concentrent dans les classes les plus aisées&quot;.</strong></p>
+<p><strong>Mise à jour</strong>: Ici encore, <a href="https://twitter.com/Paul_Puget">@Paul_Puget</a> a relevé que cette interprétation est un peu hâtive. Le graphique permet de voir l’évolution selon les différents déciles des écarts absolus de revenus entre les différentes villes. Mais on ne peut pas vraiment y lire l’évolution des rapports entre ces revenus de différentes villes. Peut-être que le rapport entre les revenus disponibles à Marseille et à Paris et le même pour le premier décile et le dernier, par exemple 0,8. On peut difficilement le lire sur ce graphique en tout cas.</p>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>J'espère que comme moi vous avez appris des choses, et surtout que ça vous a donné envie d'en savoir plus. Je vous invite à visiter le site de <a href="https://www.insee.fr/">l'INSEE</a> et celui de <a href="https://www.data.gouv.fr/">Data Gouv</a> pour chercher des données intéressantes. J'ai plein d'idées pour d'autres analyses, notamment avec l'indice de Gini, si ça vous intéresse suivez-moi sur Twitter : <a href="https://twitter.com/hypertextadrien">@hypertextadrien</a>.</p>
+<p>Et surtout n'hésitez pas à me contacter si vous avez des questions, ou si vous avez repéré des erreurs dans les manipulations de données ou dans mes interprétations !</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/">Leave Gmail in 10 steps</a></li><li>Next: <a href="/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/">Incremental crawler with Scrapy and MongoDB</a></li>
+</ul>
+
+		</main>
+
+		<footer>
+			<nav class="links">
+				<a href="https://github.com/adipasquale">
+					<svg width="100" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>GitHub</title>
+						<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+					</svg>
+					<div>GitHub</div>
+				</a>
+				<a href="mailto:adrien@dipasquale.fr">
+					<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>Mail</title>
+						<path d="M15.61 12c0 1.99-1.62 3.61-3.61 3.61-1.99 0-3.61-1.62-3.61-3.61 0-1.99 1.62-3.61 3.61-3.61 1.99 0 3.61 1.62 3.61 3.61M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12c2.424 0 4.761-.722 6.76-2.087l.034-.024-1.617-1.879-.027.017A9.494 9.494 0 0 1 12 21.54c-5.26 0-9.54-4.28-9.54-9.54 0-5.26 4.28-9.54 9.54-9.54 5.26 0 9.54 4.28 9.54 9.54a9.63 9.63 0 0 1-.225 2.05c-.301 1.239-1.169 1.618-1.82 1.568-.654-.053-1.42-.52-1.426-1.661V12A6.076 6.076 0 0 0 12 5.93 6.076 6.076 0 0 0 5.93 12 6.076 6.076 0 0 0 12 18.07a6.02 6.02 0 0 0 4.3-1.792 3.9 3.9 0 0 0 3.32 1.805c.874 0 1.74-.292 2.437-.821.719-.547 1.256-1.336 1.553-2.285.047-.154.135-.504.135-.507l.002-.013c.175-.76.253-1.52.253-2.457 0-6.617-5.383-12-12-12"></path>
+					</svg>
+					<div>mail adrien@dipasquale.fr</div>
+				</a>
+				<a href="https://ruby.social/@adrien">
+					<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+						<path clip-rule="evenodd" d="m2004.3 228h-.57c-19.87.163-38.97 2.491-50.13 7.601-.5.213-24.58 10.78-24.58 46.99 0 7.394-.14 16.236.09 25.612.4 16.438 2 32.742 7.21 45.957 5.67 14.406 15.47 25.335 32.04 29.72 14.11 3.737 26.23 4.503 35.99 3.967h.01c18.41-1.021 28.71-6.695 28.71-6.695a6.018 6.018 0 0 0 3.16-5.558l-.56-12.178a5.984 5.984 0 0 0 -2.56-4.646 5.995 5.995 0 0 0 -5.24-.804s-11.04 3.471-23.45 3.047c-4.87-.167-9.84-.357-14.18-1.544-3.91-1.069-7.14-3.148-8.76-7.347 5.59.951 13.45 2.021 22.27 2.425 10.49.481 20.33-.592 30.33-1.785 12.37-1.477 23.76-6.688 31.4-13.091 5.8-4.865 9.47-10.509 10.5-15.801v-.001c3.23-16.623 3.05-40.428 3.04-41.319-.01-36.286-24.23-46.801-24.58-46.951-11.14-5.105-30.25-7.436-50.14-7.599zm59.9 93.58.09-.471c3.1-15.948 2.73-38.451 2.73-38.451v-.067c0-27.633-17.49-36.04-17.49-36.04-.01-.008-.03-.016-.05-.024-10.05-4.616-27.33-6.379-45.26-6.527h-.41c-17.93.148-35.2 1.911-45.25 6.527l-.06.024s-17.48 8.407-17.48 36.04c0 7.308-.15 16.047.09 25.314v.004c.36 14.96 1.64 29.826 6.37 41.852 4.27 10.836 11.49 19.221 23.95 22.519 12.65 3.349 23.51 4.066 32.26 3.585 9.61-.533 16.56-2.512 20.36-3.891l-.04-.739c-5.11 1.018-12.33 2.033-20 1.771-16.29-.559-32.69-3.029-35.34-23.016a40.2 40.2 0 0 1 -.35-5.4 6 6 0 0 1 2.3-4.719 5.998 5.998 0 0 1 5.13-1.109s12.59 3.066 28.55 3.798c9.81.45 19.01-.598 28.36-1.713 9.88-1.18 19.01-5.258 25.11-10.372 3.36-2.814 5.83-5.834 6.43-8.895zm-54.2-36.244c.68-2.603 3.99-12.807 14.27-12.807 10.68 0 10.54 12.137 10.54 12.137v34.224c0 3.311 2.69 6 6 6s6-2.689 6-6v-34.406s-.68-23.955-22.54-23.955c-10 0-16.43 5.292-20.4 10.778-4.07-5.273-10.62-10.293-20.78-10.293-6.92 0-11.53 2.138-14.68 4.857-6.67 5.747-6.86 14.826-6.81 16.949l.02.455s-.01-.161-.02-.455v-.052 36.342c0 3.311 2.69 6 6 6s6-2.689 6-6v-36.342c0-.169-.01-.338-.02-.507 0 0-.5-4.577 2.66-7.298 1.45-1.252 3.66-1.949 6.85-1.949 10.65 0 14.18 9.844 14.91 12.386v20.233c0 3.311 2.69 6 6 6s6-2.689 6-6z" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" transform="translate(-1908 -212)"></path>
+					</svg>
+
+					<div>Mastodon</div>
+				</a>
+			</nav>
+
+			<p style="margin-top:2rem;">
+				<small>
+					built with <a href="https://www.11ty.dev/">Eleventy</a> & <a href="https://newcss.net/">new.css</a>
+					·
+					hosted on
+					<a href="https://github.com/adipasquale/adipasquale.github.com">GitHub Pages</a>
+					·
+					last update 2024-03
+				</small>
+			</p>
+
+		</footer>
+
+		<!-- Current page: /eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/ -->
+	</body>
+</html>

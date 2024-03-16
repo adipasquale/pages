@@ -1,0 +1,1030 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="en">
+	<title>Adrien</title>
+	<subtitle>Adrien Di Paquale personal website</subtitle>
+	<link href="https://www.dipasquale.fr/eleventy-base-blog/feed/feed.xml" rel="self"/>
+	<link href="https://www.dipasquale.fr/eleventy-base-blog/"/>
+	<updated>2019-12-10T00:00:00Z</updated>
+	<id>https://www.dipasquale.fr/</id>
+	<author>
+		<name>Adrien Di Pasquale</name>
+		<email>adrien@dipasquale.fr</email>
+	</author>
+	
+	<entry>
+		<title>Scraping tips</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/"/>
+		<updated>2019-12-10T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/</id>
+		<content type="html">&lt;p&gt;Scraping websites can sometimes get tricky, but that&#39;s when things gets interesting.
+When you&#39;re aiming to scrape data from a website that doesn&#39;t want to be scraped, it becomes like a game of cat and mouse.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/HwN6qYV.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;The website tries to identify robots and prevent them from accessing the data, without impacting actual users browsing the website.
+The robots are thus designed to mimick as closely as possible actual users&#39; behaviour, so as to become stealth.&lt;/p&gt;
+&lt;p&gt;Here is a list of recommendations, more or less obvious, but always useful to remind of.&lt;/p&gt;
+&lt;h2 id=&quot;keep-it-simple-stupid&quot; tabindex=&quot;-1&quot;&gt;Keep It Simple, Stupid &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Websites have become complex with Single Page Applications and React, Vue...
+Do not forget that browsing websites comes down to HTTP requests being sent to servers.&lt;/p&gt;
+&lt;p&gt;There are two approaches to scraping:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;reproduce individual HTTP requests one by one&lt;/li&gt;
+&lt;li&gt;mimick an actual browser and user clicking around&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;💁🏽‍♀️ As often as you can, try to use the first method. It is usually much more reliable and efficient.&lt;/p&gt;
+&lt;p&gt;However, the two approaches are complimentary.
+Sometimes the second one is necessary, if the interactions between the JS and the HTTP requests are too entangled.&lt;/p&gt;
+&lt;h2 id=&quot;sniff-out-apis&quot; tabindex=&quot;-1&quot;&gt;Sniff out APIs &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Look for public APIs that return JSON instead of HTML that you have to parse.
+Use your browser&#39;s network tab XHR filter to do so.
+This is often the case with Single Page Applications.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/i6erv0B.gif&quot; alt=&quot;Product Hunt GraphQL API&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Mobile applications also often use an API to collect data from the servers.
+Most of the time this API will be somehow authenticated, but it is sometimes very easy to find a working token.&lt;/p&gt;
+&lt;p&gt;⚙️ Use &lt;a href=&quot;https://www.charlesproxy.com/&quot;&gt;Charles Proxy&lt;/a&gt; to listen to outgoing requests from mobile applications.&lt;/p&gt;
+&lt;h2 id=&quot;know-your-http-basics&quot; tabindex=&quot;-1&quot;&gt;Know your HTTP basics &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;HTTP requests have 4 simple characteristics:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;An URL (with optional query string params)&lt;/li&gt;
+&lt;li&gt;A verb (aka a method, eg: GET, POST, etc)&lt;/li&gt;
+&lt;li&gt;Optional Headers&lt;/li&gt;
+&lt;li&gt;An optional body (for non-GET requests)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The body can be any type of text or binary data, which should be described by the &lt;code&gt;Content-Type&lt;/code&gt; header.
+You can find every valid value &lt;a href=&quot;http://www.iana.org/assignments/media-types/media-types.xhtml&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;💡 When you get stuck and cannot figure out how the website can block your request, compare these 4 characteristics to an actual request from your browser.&lt;/p&gt;
+&lt;p&gt;🔒 Also, prefer HTTPs requests, websites can get suspicious otherwise.&lt;/p&gt;
+&lt;h2 id=&quot;don-t-reinvent-the-wheel&quot; tabindex=&quot;-1&quot;&gt;Don&#39;t reinvent the wheel &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I strongly recommend against using a regular HTTP library (e.g. Python&#39;s &lt;a href=&quot;https://requests.readthedocs.io/&quot;&gt;&lt;code&gt;requests&lt;/code&gt;&lt;/a&gt; or Ruby&#39;s &lt;a href=&quot;https://github.com/httprb/http&quot;&gt;&lt;code&gt;http&lt;/code&gt;&lt;/a&gt;) .
+Instead, build upon a scraping framework like Python&#39;s &lt;a href=&quot;https://github.com/scrapy/scrapy&quot;&gt;&lt;code&gt;Scrapy&lt;/code&gt;&lt;/a&gt;, NodeJS &lt;a href=&quot;https://github.com/yujiosaka/headless-chrome-crawler&quot;&gt;&lt;code&gt;headless-chrome-scraper&lt;/code&gt;&lt;/a&gt; or Go&#39;s &lt;a href=&quot;https://github.com/gocolly/colly&quot;&gt;Colly&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You won&#39;t have to reimplement super common patterns, like requests throttling, retries policy, links traversal and deduplication, passing cookies...
+As a web framework does for building websites, this will help you focus on the core specific code that targets your websites.&lt;/p&gt;
+&lt;p&gt;🙌 &lt;a href=&quot;https://github.com/scrapy/scrapy&quot;&gt;&lt;code&gt;Scrapy&lt;/code&gt;&lt;/a&gt; is my personal favourite. It is open source with a backing company &lt;a href=&quot;https://scrapinghub.com/scrapy-cloud&quot;&gt;ScrapingHub&lt;/a&gt; that also provides a Heroku-like PaaS service. I&#39;m not affiliated to them in any way, but they provide instant deployment and scheduling, with an extremely low pricing policy (it&#39;s often free).&lt;/p&gt;
+&lt;h2 id=&quot;become-a-curl-ninja&quot; tabindex=&quot;-1&quot;&gt;Become a curl Ninja &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;You may be tempted to use GUIs like &lt;a href=&quot;https://www.getpostman.com/&quot;&gt;Postman&lt;/a&gt; or &lt;a href=&quot;https://insomnia.rest/&quot;&gt;Insomnia&lt;/a&gt;, but I would suggest you get to learn &lt;code&gt;curl&lt;/code&gt; instead.
+It is actually not very complicated and lets you do everything without restrictions.
+You can then reproduce it in any SSH terminal.
+&lt;code&gt;man curl&lt;/code&gt; is your friend.&lt;/p&gt;
+&lt;p&gt;Use and abuse the &amp;quot;Copy as curl&amp;quot; feature in your network tab, to paste it in a terminal and see if it&#39;s reproductible.
+What I often do is try and find the smallest set of headers and body params that still succeds by bissecting down.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pro Tip&lt;/em&gt;: copied curl commands can be lengthy.
+I often copy them in my IDE, search and replace all &lt;code&gt;-H&lt;/code&gt; with &lt;code&gt;-H &#92;n&lt;/code&gt; (with regex mode activated) to get one line per header.&lt;/p&gt;
+&lt;p&gt;⚙️ &lt;a href=&quot;https://curl.trillworks.com/&quot;&gt;Python to curl&lt;/a&gt; is a tool that converts curl commands to Python &lt;code&gt;requests&lt;/code&gt; call.&lt;/p&gt;
+&lt;h2 id=&quot;best-practices-for-scrapers&quot; tabindex=&quot;-1&quot;&gt;Best practices for scrapers &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Fetch first, store the response and then parse it. This way you won&#39;t have to refetch if there is a bug in your parser.&lt;/li&gt;
+&lt;li&gt;You can also use caching locally when developping to bypass this problem&lt;/li&gt;
+&lt;li&gt;Distribute the workload in successive steps. eg. for a cooking website, first retrieve all recipes URLs and then fetch them instead of directly following every nested link.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;it-works-on-my-computer&quot; tabindex=&quot;-1&quot;&gt;It works on my computer™️ &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;As often, the scraper you wrote may work locally but not in production.&lt;/p&gt;
+&lt;p&gt;One source of issues is the IP of your server that may be blacklisted.
+It is easy for the defending websites to block whole range of IPs that are known to come from datacenters, or to whitelist specific countries IPs.
+The usual counter for this is to use proxies.
+You will find countless services that sell proxies access on the internet, with varying quality.
+Sometimes you won&#39;t have a choice but to use residential proxies that are costy (&amp;gt;100USD/mo.).&lt;/p&gt;
+&lt;p&gt;⚙️ &lt;a href=&quot;https://icanhazip.com/&quot;&gt;icanhazip&lt;/a&gt; is a simpleway to check the IP you&#39;re currently scraping from.&lt;/p&gt;
+&lt;p&gt;Another source of trouble is the classical environment differences that you forgot about.
+For example, you may generate timestamps in your code and format them to forge requests, and the timezone may be different on your machine and on the production server.&lt;/p&gt;
+&lt;p&gt;⚙️ &lt;a href=&quot;https://httpbin.org/&quot;&gt;httpbin&lt;/a&gt; can be useful to double check that the received data by the distant server is actually what you meant to send.&lt;/p&gt;
+&lt;h2 id=&quot;have-fun&quot; tabindex=&quot;-1&quot;&gt;Have fun! &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-12-10-scraping-tips/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Figuring out how to bypass another developer&#39;s protections can be a really fun puzzle to solve.&lt;/p&gt;
+&lt;p&gt;🤜🤛 Be a good citizen and scrape responsibly:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Space out requests so they don&#39;t overflow the website.&lt;/li&gt;
+&lt;li&gt;Only scrape public data&lt;/li&gt;
+&lt;li&gt;If you encounter private or sensitive data that should not be public, warn the website.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Written by &lt;a href=&quot;https://github.com/maelorn&quot;&gt;Ismaël Attoumani&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/hypertextadrien/&quot;&gt;Adrien Di Pasquale&lt;/a&gt;, proofread by &lt;a href=&quot;https://twitter.com/AntoineAugusti&quot;&gt;Antoine Augusti&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Combining React Router and Shopify App Bridge Navigation</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/"/>
+		<updated>2019-02-28T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/</id>
+		<content type="html">&lt;p&gt;In this article we will show you a quick way to navigate correctly inside your react embedded app using shopify app-bridge and polaris libraries.&lt;/p&gt;
+&lt;h2 id=&quot;linking-links&quot; tabindex=&quot;-1&quot;&gt;Linking links &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The first thing to do is to link the react router &lt;code&gt;Link&lt;/code&gt;  component with shopify polaris &lt;code&gt;Link&lt;/code&gt;. To do so, we pass an Adapter to our &lt;code&gt;AppProvider&lt;/code&gt; component. Shopify anticipated this issue so you only have to pass the Adapter to the &lt;code&gt;AppProvider&lt;/code&gt; component under the attribute &lt;code&gt;linkComponent&lt;/code&gt;. Here is an example :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; Link &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;react-router-dom&#39;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; AppProvider &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;@shopify/polaris&#39;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;AdapterLink&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token parameter&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;...&lt;/span&gt;rest &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;Link&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token attr-name&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;url&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token spread&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;...&lt;/span&gt;rest&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;/&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+ReactDOM&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;render&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+  &lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;AppProvider&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;token attr-name&quot;&gt;apiKey&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;apiKey&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;token attr-name&quot;&gt;shopOrigin&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;shopOrigin&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;token attr-name&quot;&gt;linkComponent&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;AdapterLink&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+  &lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+  ...
+  &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;AppProvider&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;a-history-of-wrap&quot; tabindex=&quot;-1&quot;&gt;A history of wrap &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://help.shopify.com/en/api/embedded-apps/app-bridge/actions/navigation/history&quot;&gt;Here is how to use the app bridge history object to navigate inside your app.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Now what we want is to provide to the history the url given to our &lt;code&gt;Route&lt;/code&gt; component.&lt;/p&gt;
+&lt;h3 id=&quot;accessing-the-history-object&quot; tabindex=&quot;-1&quot;&gt;Accessing the history object &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/&quot;&gt;#&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The doc does not tell us how to access the history from inside a react component. But it is actually possible to access it via &lt;a href=&quot;https://reactjs.org/docs/context.html&quot;&gt;React contexts&lt;/a&gt; if your component is between two &lt;code&gt;AppProvider&lt;/code&gt; components by adding this :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;static&lt;/span&gt; contextTypes &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token literal-property property&quot;&gt;polaris&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; PropTypes&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;object
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;now you can call the &lt;code&gt;appBridge&lt;/code&gt; inside your class, like for example in the constuctor :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;&lt;span class=&quot;token function&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token parameter&quot;&gt;props&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;context&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token keyword&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; context&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; app &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;context&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;polaris&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;appBridge
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;wrapper&quot; tabindex=&quot;-1&quot;&gt;Wrapper &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/&quot;&gt;#&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To combine both things we have to push the url of the &lt;code&gt;Route&lt;/code&gt; inside the polaris history. So what we did is creating a wrapped component that does that every time he receives a new url :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; History &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;@shopify/app-bridge/actions&#39;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; Route &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;react-router-dom&#39;&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;withShopifyEmbeddedAppPushState&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token parameter&quot;&gt;WrappedComponent&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;extends&lt;/span&gt; React&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Component &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;static&lt;/span&gt; contextTypes &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;token literal-property property&quot;&gt;polaris&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; PropTypes&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;object
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;token function&quot;&gt;componentWillReceiveProps&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token parameter&quot;&gt;nextProps&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; app &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;context&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;polaris&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;appBridge
+      &lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; history &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; History&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;app&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+      history&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;dispatch&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;History&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Action&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token constant&quot;&gt;PUSH&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; nextProps&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;computedMatch&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;url&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;token function&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;WrappedComponent&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token spread&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;/&gt;&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;const&lt;/span&gt; ShopifyEmbeddedAppRoute &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;withShopifyEmbeddedAppPushState&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;Route&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;et-voila&quot; tabindex=&quot;-1&quot;&gt;Et voilà ! &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2019-02-28-polaris-react-router/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Here is what your rendering should like now :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;ReactDOM&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token function&quot;&gt;render&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+   &lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;AppProvider&lt;/span&gt;&lt;/span&gt;
+     &lt;span class=&quot;token attr-name&quot;&gt;apiKey&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;apiKey&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+     &lt;span class=&quot;token attr-name&quot;&gt;shopOrigin&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;shopOrigin&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+     &lt;span class=&quot;token attr-name&quot;&gt;linkComponent&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;AdapterLink&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+   &lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;BrowserRouter&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+       &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;div&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;Switch&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+           &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;ShopifyEmbeddedAppRoute&lt;/span&gt;&lt;/span&gt;
+             &lt;span class=&quot;token attr-name&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;token attr-value&quot;&gt;&lt;span class=&quot;token punctuation attr-equals&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&#39;&lt;/span&gt;/products&lt;span class=&quot;token punctuation&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt;
+             &lt;span class=&quot;token attr-name&quot;&gt;render&lt;/span&gt;&lt;span class=&quot;token script language-javascript&quot;&gt;&lt;span class=&quot;token script-punctuation punctuation&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token parameter&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;ProductsContainer&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token spread&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;...&lt;/span&gt;p&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token spread&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;...&lt;/span&gt;props&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;/&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+           &lt;span class=&quot;token punctuation&quot;&gt;/&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;Switch&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+       &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;div&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;BrowserRouter&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;AppProvider&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now if you place links inside your react app :&lt;/p&gt;
+&lt;pre class=&quot;language-jsx&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-jsx&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt; Link &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;@shopify/polaris&#39;&lt;/span&gt;
+&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;Link&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token attr-name&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;token attr-value&quot;&gt;&lt;span class=&quot;token punctuation attr-equals&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&#39;&lt;/span&gt;/products&lt;span class=&quot;token punctuation&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token plain-text&quot;&gt;Subscription Products&lt;/span&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token tag&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;token class-name&quot;&gt;Link&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;it will call our wrapped component that will push the correct url inside shopify history !
+You are now in the right page with the correct url 🕺&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Build and deploy huge static websites with Caddy</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/"/>
+		<updated>2018-12-27T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/</id>
+		<content type="html">&lt;p&gt;I will show you how to setup the hosting and deployment of a static website with thousands of pages dynamically built. It uses the &lt;a href=&quot;https://caddyserver.com/&quot;&gt;Caddy web server&lt;/a&gt; and a &lt;a href=&quot;https://digitalocean.com/&quot;&gt;Digital Ocean&lt;/a&gt;&#39;s droplet - but it would work with any Ubuntu server.&lt;/p&gt;
+&lt;h1 id=&quot;introduction&quot; tabindex=&quot;-1&quot;&gt;Introduction &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;h2 id=&quot;first-of-all-don-t-do-it&quot; tabindex=&quot;-1&quot;&gt;First of all, don&#39;t do it! &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;There are very few cases where it makes sense to use such a setup.
+&lt;a href=&quot;https://www.netlify.com/&quot;&gt;Netlify&lt;/a&gt;, among others, is a great hosting provider for static websites.
+It is way simpler to setup, it can run custom build scripts, it gives you HTTPS out of the box, and CDN delivery.
+All that for free!
+So really, try building your website there first.&lt;/p&gt;
+&lt;p&gt;In some cases though, you may reach Netlify&#39;s limits.
+I personally experienced failures on Netlify upon deploying a website with 20k+ pages.
+Even though the build part takes 2 minutes or so, deploys would hang on the upload step.&lt;/p&gt;
+&lt;h2 id=&quot;why-not-host-it-on-s3&quot; tabindex=&quot;-1&quot;&gt;Why not host it on S3 ? &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The next reasonable option would be to host the static website on S3.
+It&#39;s a pretty common setup too and is well documented by AWS.&lt;/p&gt;
+&lt;p&gt;Because builds should be automated, I tried setting up an AWS Lambda function that runs the build and uploads the files to S3.
+After 2 days of headaches fighting with the AWS docs to understand how to make it work, I managed to finally run it.
+Only to find out that the upload process from the AWS Lambda local storage to S3 is not fast enough.&lt;/p&gt;
+&lt;p&gt;I tried parallelizing the uploads using threads, but it was still too slow.
+I managed to get to about 500 pages/minute but the Lambdas have a maximum timeout of 15 minutes so it&#39;s not enough.
+In any cases, a build that takes more than 15 minutes would not have been satisfying.&lt;/p&gt;
+&lt;p&gt;I&#39;m not an AWS expert, but the whole process was so frustrating that I decided to go old-school and host it on a server I control.&lt;/p&gt;
+&lt;h1 id=&quot;server-setup&quot; tabindex=&quot;-1&quot;&gt;Server setup &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;I chose to use &lt;a href=&quot;https://www.digitalocean.com/&quot;&gt;Digital Ocean (aka DO)&lt;/a&gt; for hosting my server, but most of these instructions would be applicable to any other provider (&lt;a href=&quot;https://www.scaleway.com//&quot;&gt;Scaleway&lt;/a&gt;, &lt;a href=&quot;https://www.vultr.com/&quot;&gt;Vultr&lt;/a&gt;, &lt;a href=&quot;https://www.exoscale.com&quot;&gt;Exoscale&lt;/a&gt; ...).&lt;/p&gt;
+&lt;p&gt;DO has a great blog about &lt;a href=&quot;https://blog.digitalocean.com/deploying-a-fully-automated-git-based-static-website-in-under-5-minutes/&quot;&gt;Deploying a Fully-automated Git-based Static Website in Under 5 Minutes&lt;/a&gt; which helped me a lot.
+I have condensed the instructions into a shell script: &lt;a href=&quot;https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670&quot;&gt;https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670&lt;/a&gt;.
+If you&#39;re not familiar with this kind of setup, I suggest you follow the blog post instead of running the script.&lt;/p&gt;
+&lt;p&gt;In order to run the script, SSH into the newly created server and:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token function&quot;&gt;wget&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-O&lt;/span&gt; - https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670/raw &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;sh&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is a quick summary of this script:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It installs the Caddy server&lt;/li&gt;
+&lt;li&gt;It creates a systemd service&lt;/li&gt;
+&lt;li&gt;It sets up Caddy to listen to a subdomain of nip.io&lt;/li&gt;
+&lt;li&gt;Caddy will use Let&#39;s Encrypt to get you a valid SSL certificate so that HTTPS works out-of-the-box.&lt;/li&gt;
+&lt;li&gt;It uses the Caddy git plugin to automatically stay in sync with this repo: &lt;a href=&quot;https://github.com/kamaln7/basic-static-website&quot;&gt;kamaln7/basic-static-website&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The last output should point you to an URL that looks like https://YOUR_SERVER_IP.nip.io:&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IsPIwBrsgR-2046.avif 2046w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IsPIwBrsgR-2046.webp 2046w&quot;&gt;&lt;img alt=&quot;basic static website&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IsPIwBrsgR-2046.png&quot; width=&quot;2046&quot; height=&quot;1324&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;(notice the green lock :)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;In case it does not work properly, you can run this command on the server to see logs and exceptions from Caddy:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tail -f /var/log/syslog
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Important Note&lt;/strong&gt;: We are skipping a lot of important steps for an actual production server here:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;You should follow &lt;a href=&quot;https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04&quot;&gt;this DO guide&lt;/a&gt; for securing your Ubuntu droplet&lt;/li&gt;
+&lt;li&gt;You should create a DO Firewall &lt;a href=&quot;https://cloud.digitalocean.com/networking/firewalls&quot;&gt;here&lt;/a&gt; and allow SSH, HTTP, and HTTPS inbound traffic&lt;/li&gt;
+&lt;li&gt;If you own a domain name, you can add an DNS record of the A type that points to your droplet&#39;s IP, or follow &lt;a href=&quot;https://www.digitalocean.com/docs/networking/dns/how-to/add-domains/&quot;&gt;this short guide&lt;/a&gt; to use DO&#39;s own name servers. Here, we are using nip.io to have a subdomain without any setup.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&quot;dynamic-build-system&quot; tabindex=&quot;-1&quot;&gt;Dynamic build system &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Currently, the server is synchronizing with a very simple static website project, that has no build script at all.&lt;/p&gt;
+&lt;p&gt;We will now switch to a dynamic build system.
+The build script will create HTML pages from external data and template files, and the server will now serve the resulting files.
+This build script will be re-executed upon each git push to the repository.&lt;/p&gt;
+&lt;p&gt;For the purpose of this article, I have created a very simple static website builder: &lt;a href=&quot;https://github.com/adipasquale/giantsite&quot;&gt;giantsite&lt;/a&gt;.
+It&#39;s a 50-lines Python 3 script, that queries a &lt;a href=&quot;https://jsonplaceholder.typicode.com/&quot;&gt;dummy API&lt;/a&gt; for 5000 photos, builds an HTML page for each and an index page that links to them.&lt;/p&gt;
+&lt;p&gt;First, fork &lt;a href=&quot;https://github.com/adipasquale/giantsite&quot;&gt;giantsite&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now let&#39;s update Caddy&#39;s configuration.
+SSH into the server and update it with &lt;code&gt;vim /etc/caddy/Caddyfile&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# /etc/caddy/Caddyfile
+
+https://YOUR_SERVER_IP.nip.io {
+    [...]
+    git https://github.com/YOUR_GITHUB_HANDLE/giantsite /var/code/giantsite {
+        interval 300
+        then python3 /var/code/giantsite/build.py /var/www
+    }
+    root /var/www
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;(don&#39;t forget to replace the CAPITAL_PARTS with your infos)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Here is what we have changed:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We have switched the GitHub repository from the static one to the dynamically built one that you just forked.&lt;/li&gt;
+&lt;li&gt;We have also specified where the local repository should be stored: &lt;code&gt;/var/code/giantsite&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;We have added a call to the &lt;code&gt;build.py&lt;/code&gt; script from the fetched repo in the &lt;code&gt;then&lt;/code&gt; option.
+It will be ran upon each new pull.&lt;/li&gt;
+&lt;li&gt;Finally, we have declared that the server&#39;s root is &lt;code&gt;/var/www&lt;/code&gt;.
+It defines the files that will be served.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We still have to perform a few steps in order for this setup to work.
+Again, ssh into the server and run these commands&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# Install python3 (it&#39;s already installed on DO&#39;s droplets)&lt;/span&gt;
+&lt;span class=&quot;token function&quot;&gt;apt&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; python3
+
+&lt;span class=&quot;token comment&quot;&gt;# Create the new folders and set correct permissions&lt;/span&gt;
+&lt;span class=&quot;token function&quot;&gt;mkdir&lt;/span&gt; /var/code/
+&lt;span class=&quot;token function&quot;&gt;mkdir&lt;/span&gt; /var/www/
+&lt;span class=&quot;token function&quot;&gt;chown&lt;/span&gt; www-data:www-data /var/code/
+&lt;span class=&quot;token function&quot;&gt;chown&lt;/span&gt; www-data:www-data /var/www/
+
+&lt;span class=&quot;token comment&quot;&gt;# Restart Caddy, this will trigger a re-build&lt;/span&gt;
+systemctl restart caddy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Note : You may have to use &lt;code&gt;sudo&lt;/code&gt; here if you&#39;re not logged in as root&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;You should now be able to access your website and see the newly built website :&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/6UM0nCpHBC-718.avif 718w&quot;&gt;&lt;source type=&quot;image/gif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/6UM0nCpHBC-718.gif 718w&quot;&gt;&lt;img alt=&quot;giantsite screencast&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/6UM0nCpHBC-718.webp&quot; width=&quot;718&quot; height=&quot;465&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;h2 id=&quot;auto-deploys-on-push&quot; tabindex=&quot;-1&quot;&gt;Auto-deploys on push &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Currently, our Caddy server will synchronize with the GitHub repository every 300 seconds or so.
+Let&#39;s setup a Webhook from GitHub to our server, so that it synchronizes and rebuilds upon each push.&lt;/p&gt;
+&lt;p&gt;First, open a terminal and copy the output from &lt;code&gt;uuidgen&lt;/code&gt;.
+We&#39;ll use this random string as a shared secret in our Webhook.&lt;/p&gt;
+&lt;p&gt;Now let&#39;s setup Caddy so it listens to the Webhook.
+SSH into the server, and run &lt;code&gt;vim /etc/caddy/Caddyfile&lt;/code&gt; :&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# /etc/caddy/Caddyfile&lt;/span&gt;
+
+https://YOUR_SERVER_IP.nip.io &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;.&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;token function&quot;&gt;git&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;.&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;.&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        hook /github_hook YOUR_WEBHOOK_SECRET
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and again, restart Caddy with :&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;systemctl restart caddy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The last step is to go to your forked GitHub repository&#39;s Settings, and click &amp;quot;Add Webhook&amp;quot; in the Webhooks tab. Use &lt;code&gt;https://YOUR_SERVER_IP.nip.io/github_webhook&lt;/code&gt; for the url. I suggest using a JSON Webhook, I&#39;ve had issues with the regular ones&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/0pu8wGHx-U-2020.avif 2020w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/0pu8wGHx-U-2020.webp 2020w&quot;&gt;&lt;img alt=&quot;Create a GitHub Webhook&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/0pu8wGHx-U-2020.png&quot; width=&quot;2020&quot; height=&quot;998&quot;&gt;&lt;/picture&gt;.&lt;/p&gt;
+&lt;p&gt;You can now try making a small change to the &lt;code&gt;build.py&lt;/code&gt; script and pushing it.
+Your Caddy server should pick it up within a few seconds, and rebuild the pages accordingly.&lt;/p&gt;
+&lt;h1 id=&quot;bonus-api-to-manually-trigger-re-builds&quot; tabindex=&quot;-1&quot;&gt;Bonus: API to manually trigger re-builds &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;If your external data is updated, you may want to trigger a build even though the code has not changed.
+It can therefore be useful to have another Webhook that triggers rebuilds and is not linked to GitHub.&lt;/p&gt;
+&lt;p&gt;Let&#39;s setup a small server that listens to GET requests on &lt;code&gt;/admin/rebuild&lt;/code&gt; and triggers builds.
+I&#39;m using &lt;a href=&quot;https://bottlepy.org/docs/dev/&quot;&gt;bottle&lt;/a&gt; here, as it&#39;s the simplest one I can think of, but feel free to use any framework you like.&lt;/p&gt;
+&lt;p&gt;Create a new &lt;code&gt;server.py&lt;/code&gt; file at the root of your forked repository :&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# server.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; build &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; Builder
+&lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; bottle &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; route&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; run
+
+
+&lt;span class=&quot;token decorator annotation punctuation&quot;&gt;@route&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;/admin/rebuild&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;rebuild&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    Builder&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;/var/www&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;build&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;Rebuild done !&#39;&lt;/span&gt;
+
+run&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;localhost&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; port&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;8000&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; debug&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Commit it and push it so that your server picks it up.&lt;/p&gt;
+&lt;p&gt;Now, SSH into your server and install bottle:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token function&quot;&gt;apt&lt;/span&gt; update
+&lt;span class=&quot;token function&quot;&gt;apt&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-y&lt;/span&gt; python3-pip
+pip3 &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; bottle&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You need to create another systemd service for this bottle server:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# /etc/systemd/system/bottle.service&lt;/span&gt;
+
+&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;Unit&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;token assign-left variable&quot;&gt;Description&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;Bottle server
+&lt;span class=&quot;token assign-left variable&quot;&gt;After&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;syslog.target
+
+&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;Service&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;token assign-left variable&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;simple
+&lt;span class=&quot;token assign-left variable&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;www-data
+&lt;span class=&quot;token assign-left variable&quot;&gt;Group&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;www-data
+&lt;span class=&quot;token assign-left variable&quot;&gt;WorkingDirectory&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;/var/code/giantsite
+&lt;span class=&quot;token assign-left variable&quot;&gt;ExecStart&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;/usr/bin/env python3 server.py
+&lt;span class=&quot;token assign-left variable&quot;&gt;StandardOutput&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;syslog
+&lt;span class=&quot;token assign-left variable&quot;&gt;StandardError&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;syslog
+&lt;span class=&quot;token assign-left variable&quot;&gt;Restart&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;always
+&lt;span class=&quot;token assign-left variable&quot;&gt;RestartSec&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;
+
+&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;Install&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;token assign-left variable&quot;&gt;WantedBy&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;bottle.target&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This new service can be started with:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;systemctl start bottle
+systemctl &lt;span class=&quot;token builtin class-name&quot;&gt;enable&lt;/span&gt; bottle&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And we also have to update the Caddyfile so that external requests are directed to this bottle server:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# /etc/caddy/Caddyfile&lt;/span&gt;
+
+https://YOUR_SERVER_IP.nip.io &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;.&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+    proxy /admin localhost:8000 &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        transparent
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Note: I used a namespaced route &lt;code&gt;/admin&lt;/code&gt; here but you&#39;re free to do as you please. Be careful that it matches what bottle expects though.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Finally, restart Caddy so that the changes are applied:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;systemctl restart caddy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Phew! You should now be able to trigger a rebuild with a simple:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token function&quot;&gt;curl&lt;/span&gt; https://YOUR_SERVER_IP.nip.io/admin/rebuild&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;🛠 Build, Build, Build 🛠&lt;/p&gt;
+&lt;h1 id=&quot;conclusion&quot; tabindex=&quot;-1&quot;&gt;Conclusion &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;This setup makes sense only in rare situations, namely when you are building thousands of files.
+It&#39;s an interesting experience though, as it shows how easy and convenient Caddy makes it.
+The &lt;a href=&quot;https://caddyserver.com/docs/http.git&quot;&gt;git plugin&lt;/a&gt; is particularly cool, it&#39;s so nice to be able to deploy with a simple &lt;code&gt;git push&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This setup is not ready for production, make sure to add some security measures! The rebuild API is completely unprotected for instance.&lt;/p&gt;
+&lt;p&gt;Let me know what you think!&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://news.ycombinator.com/item?id=18768691&quot;&gt;Discuss on Hacker News&lt;/a&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Incremental crawler with Scrapy and MongoDB</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/"/>
+		<updated>2018-12-17T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/</id>
+		<content type="html">&lt;ul&gt;
+&lt;li&gt;updated on 25/12/2018 : &lt;a href=&quot;https://github.com/adipasquale/blog.dipasquale.fr/commit/8d2b191e1a1a7151c6b01b088d9c98812376aec1&quot;&gt;&lt;em&gt;fixed from_crawler method overriding&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In this post I will show you how to scrape a website incrementally.
+Each new scraping session will only scrape new items.
+We will be crawling &lt;a href=&quot;https://techcrunch.com/&quot;&gt;Techcrunch blog posts&lt;/a&gt; as an example here.&lt;/p&gt;
+&lt;p&gt;This tutorial will use Scrapy, a great Python scraping library.
+It&#39;s simple yet very powerful.
+If you don&#39;t know it, have a look at their &lt;a href=&quot;https://doc.scrapy.org/en/latest/intro/overview.html&quot;&gt;overview page&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We will also use MongoDB, the famous NoSQL DB, but it would be a similar process with any DB you want.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TLDR;&lt;/strong&gt; if you already know Scrapy, head to the &lt;a href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;last part about incremental scraping&lt;/a&gt;. You can find the full code for this project &lt;a href=&quot;https://github.com/adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb&quot;&gt;here on GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h1 id=&quot;setup-your-scrapy-spider&quot; tabindex=&quot;-1&quot;&gt;Setup your Scrapy spider &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Start by installing Scrapy&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;pip3 &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; scrapy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;(in a real project, you would use a &lt;a href=&quot;https://virtualenv.pypa.io/en/latest/&quot;&gt;virtualenv&lt;/a&gt; and a &lt;code&gt;requirements.txt&lt;/code&gt; file)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;and initialize your project with:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;scrapy startproject tc_scraper
+&lt;span class=&quot;token builtin class-name&quot;&gt;cd&lt;/span&gt; tc_scraper
+scrapy genspider techcrunch techcrunch.com&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&quot;scrape-the-posts&quot; tabindex=&quot;-1&quot;&gt;Scrape the posts &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;h2 id=&quot;play-around-in-the-shell&quot; tabindex=&quot;-1&quot;&gt;Play around in the shell &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;First have a look at the DOM structure on &lt;a href=&quot;https://www.techcrunch.com&quot;&gt;https://www.techcrunch.com&lt;/a&gt;, using your browser&#39;s developer tools.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Make sure to disable Javascript&lt;/strong&gt;, because the scraper will not execute it by default.
+It&#39;s doable with Scrapy, but it&#39;s not the point of this tutorial.
+I&#39;m using &lt;a href=&quot;https://addons.mozilla.org/en-US/firefox/addon/javascript-toggler/&quot;&gt;this extension&lt;/a&gt; to easily disable JS on Firefox.&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/K1lq4zmGWW-1297.avif 1297w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/K1lq4zmGWW-1297.webp 1297w&quot;&gt;&lt;img alt=&quot;inspection of Techcrunch&#39;s DOM in Firefox&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/K1lq4zmGWW-1297.png&quot; width=&quot;1297&quot; height=&quot;989&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;You can then open a Scrapy shell with&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;scrapy shell https://www.techcrunch.com&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This shell is very helpful to play around and figure out how to extract the data. Here are some commands you can try one by one:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+posts &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+posts&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+posts&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block__title__link&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+title &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; posts&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block__title__link&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+title
+title&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;::attr(href)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+title&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;::attr(href)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We are using CSS selectors, and the &lt;code&gt;attr&lt;/code&gt; function on CSS3 pseudo-elements.
+Learn more about this extraction part in the &lt;a href=&quot;https://doc.scrapy.org/en/latest/topics/selectors.html&quot;&gt;scrapy docs&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;scrapy-architecture&quot; tabindex=&quot;-1&quot;&gt;Scrapy architecture &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/M8E8zmMYaF-700.avif 700w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/M8E8zmMYaF-700.webp 700w&quot;&gt;&lt;img alt=&quot;scrapy architecture&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/M8E8zmMYaF-700.png&quot; width=&quot;700&quot; height=&quot;494&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;This diagram  from &lt;a href=&quot;https://doc.scrapy.org/en/0.10.3/topics/architecture.html&quot;&gt;scrapy docs&lt;/a&gt; is a quick overview of how Scrapy works:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;span style=&quot;color:#DC2300;&quot;&gt;Spider&lt;/span&gt; yields &lt;span style=&quot;color:#8AAF59&quot;&gt;Requests&lt;/span&gt;, which are sent to the &lt;span style=&quot;color:#CCCCFF&quot;&gt;Scheduler&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;span style=&quot;color:#CCCCFF&quot;&gt;Scheduler&lt;/span&gt; sends &lt;span style=&quot;color:#8AAF59&quot;&gt;Requests&lt;/span&gt; to the &lt;span style=&quot;color:#E6E64C&quot;&gt;Downloader&lt;/span&gt;, which executes them against the distant website.&lt;/li&gt;
+&lt;li&gt;The &lt;span style=&quot;color:#8AAF59&quot;&gt;Responses&lt;/span&gt; are sent to the &lt;span style=&quot;color:#DC2300;&quot;&gt;Spider&lt;/span&gt; for parsing.&lt;/li&gt;
+&lt;li&gt;The &lt;span style=&quot;color:#DC2300;&quot;&gt;Spider&lt;/span&gt; parses and yields Items, which are sent to the &lt;span style=&quot;color:#FF9966&quot;&gt;Item Pipeline&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;span style=&quot;color:#FF9966&quot;&gt;Item Pipeline&lt;/span&gt; is responsible for processing them and storing them.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In this tutorial, we will not touch the &lt;span style=&quot;color:#CCCCFF&quot;&gt;Scheduler&lt;/span&gt;, nor the &lt;span style=&quot;color:#E6E64C&quot;&gt;Downloader&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;We will only write a &lt;span style=&quot;color:#DC2300;&quot;&gt;Spider&lt;/span&gt; and tweak the &lt;span style=&quot;color:#FF9966&quot;&gt;Item Pipeline&lt;/span&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;scrape-the-list-pages&quot; tabindex=&quot;-1&quot;&gt;Scrape the list pages &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So let&#39;s write the first part of the scraper:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# spiders/techcrunch.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; scrapy
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TechcrunchSpider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;techcrunch&#39;&lt;/span&gt;
+    allowed_domains &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;techcrunch.com&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+    start_urls &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;https://techcrunch.com/&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; post &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            title &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; post&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block__title__link&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; title&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;::attr(href)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;yield&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Request&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; callback&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;parse_post&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.load-more&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            next_page_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.load-more::attr(href)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;yield&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Request&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;next_page_url&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse_post&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;pass&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is a walkthrough of this spider:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It starts by scraping the start url https://techcrunch.com/&lt;/li&gt;
+&lt;li&gt;It goes through all posts blocks, extracts the link, and enqueues a new request.
+This new request will use a different callback from the default one: &lt;code&gt;parse_post&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;After going through all the posts, it looks for a next page link, and if it finds it, it enqueues a new request with that link.
+This request will use the default callback &lt;code&gt;parse&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can run it with &lt;code&gt;scrapy crawl techcrunch&lt;/code&gt;, but be aware that it will go through ALL the pages (thousands here), so be ready to hit &lt;code&gt;CTRL+C&lt;/code&gt; to stop it!&lt;/p&gt;
+&lt;h2 id=&quot;add-a-pages-limit-argument&quot; tabindex=&quot;-1&quot;&gt;Add a pages limit argument &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In order to avoid this problem, let&#39;s add a pages limit argument to our spider right now:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# spiders/techcrunch.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; scrapy
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; re
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TechcrunchSpider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; limit_pages&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;args&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;**&lt;/span&gt;kwargs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token builtin&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;TechcrunchSpider&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;__init__&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;args&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;**&lt;/span&gt;kwargs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; limit_pages &lt;span class=&quot;token keyword&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;limit_pages &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;limit_pages&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;limit_pages &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.load-more&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            next_page_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.load-more::attr(href)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token comment&quot;&gt;# urls look like https://techcrunch.com/page/4/&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; re&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;r&quot;.*&#92;/page&#92;/(&#92;d+)&#92;/&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; next_page_url&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            next_page_number &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token keyword&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;groups&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; next_page_number &lt;span class=&quot;token operator&quot;&gt;&amp;lt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;limit_pages&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;yield&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Request&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;next_page_url&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the constructor, we allow passing a new kwarg called limit_pages, which we cast to an integer.
+In the &lt;code&gt;parse&lt;/code&gt; method, we extract the next page number thanks to a regex on the url. Then we compare it to the &lt;code&gt;limit_pages&lt;/code&gt; argument, and only if it&#39;s below, we enqueue the next page request.&lt;/p&gt;
+&lt;p&gt;You can now run the spider safely with:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;scrapy crawl techcrunch &lt;span class=&quot;token parameter variable&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;limit_pages&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;scrape-the-post-pages&quot; tabindex=&quot;-1&quot;&gt;Scrape the post pages &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So far, we have left the &lt;code&gt;scrape_post&lt;/code&gt; request empty, so our spider is not actually scraping anything.
+Here is what post pages look like (again, without JS):&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/Bynikwn-dI-789.avif 789w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/Bynikwn-dI-789.webp 789w&quot;&gt;&lt;img alt=&quot;a Techcrunch post page&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/Bynikwn-dI-789.png&quot; width=&quot;789&quot; height=&quot;948&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;Before writing the scraper method, we need to declare the items that we are going to scrape:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# items.py&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; scrapy
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;BlogPost&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Item&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Field&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    title &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Field&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    author &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Field&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    content &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Field&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    published_at &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Field&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Note: There is now a &lt;a href=&quot;https://stackoverflow.com/a/5077350&quot;&gt;simple way&lt;/a&gt; to have a dynamic schema without manually declaring all the fields.
+I will show how to use it in a next article&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;You can open a new Scrapy shell to play around on any post page and figure out the selectors you are going to use.
+For example:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;scrapy shell https://techcrunch.com/2017/05/01/awesomeness-is-launching-a-news-division-aimed-at-gen-z/&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And once you have figured them out, you can write the scraper&#39;s missing method:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# spiders/techcrunch.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; tc_scraper&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;items &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; BlogPost
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; datetime
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TechcrunchSpider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+
+    &lt;span class=&quot;token comment&quot;&gt;# ...&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse_post&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        item &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; BlogPost&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            title&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;h1::text&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            author&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.article__byline&gt;a::text&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;strip&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            published_at&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_post_date&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            content&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_content&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            url&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;url
+        &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;yield&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;item&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;extract_post_date&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        date_text &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;meta[name=&#39;sailthru.date&#39;]::attr(content)&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract_first&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; datetime&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;datetime&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;strptime&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;date_text&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;%Y-%m-%d %H:%M:%S&quot;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;extract_content&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        paragraphs_texts &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;
+        p&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot; ::text&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;extract&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; p &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.article-content&gt;p&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        paragraphs &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;join&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;p&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; p &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; paragraphs_texts&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        paragraphs &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;re&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;subn&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&#92;n&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; p &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; paragraphs&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        paragraphs &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;p &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; p &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; paragraphs &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; p&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;strip&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;&#92;n&#92;n&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;join&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;paragraphs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So what&#39;s going here?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We instanciate a &lt;code&gt;BlogPost&lt;/code&gt; item that we then yield, that&#39;s the Scrapy way.&lt;/li&gt;
+&lt;li&gt;Most of the fields are straightforward, so we write their selectors inline.
+Some others are more complicated so we have extracted them to independent methods.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;published_at&lt;/code&gt; field is a bit tricky because in the visible DOM there is no plain text datetime, only a vague &#39;X hours/days ago&#39;.
+If you inspect the DOM closely, you will find this meta &lt;code&gt;sailthru.date&lt;/code&gt; that is easy to use and parse.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;extract_content&lt;/code&gt; method is quite involved, but it&#39;s really not key to this article&#39;s objective.
+We are basically joining the texts from the different paragraphs in a way that&#39;s human readable.
+Because the content is actually HTML, we are losing some infos in the process, like the links and images.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can now run the spider with:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;scrapy crawl techcrunch &lt;span class=&quot;token parameter variable&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;limit_pages&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;token parameter variable&quot;&gt;-o&lt;/span&gt; posts.json&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and Scrapy will generate a nice &lt;code&gt;posts.json&lt;/code&gt; file with all the scraped items. Yay!&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/jRoOTRr7Mi-1252.avif 1252w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/jRoOTRr7Mi-1252.webp 1252w&quot;&gt;&lt;img alt=&quot;display posts.json contents&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/jRoOTRr7Mi-1252.png&quot; width=&quot;1252&quot; height=&quot;1190&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;h1 id=&quot;incremental-scraping&quot; tabindex=&quot;-1&quot;&gt;&lt;a name=&quot;incremental&quot;&gt;&lt;/a&gt;Incremental Scraping &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;h2 id=&quot;store-items-in-mongodb&quot; tabindex=&quot;-1&quot;&gt;Store items in MongoDB &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So in the last step we exported the items to a JSON file.
+For long term storage and re-use, it&#39;s more convenient to use a database.
+We will use MongoDB here, but you could use a regular SQL database too.
+I personally find it convenient on scraping projects to use a NoSQL database because of the frequent schema changes, especially as you initially iterate on the scraper.&lt;/p&gt;
+&lt;p&gt;If you are on Mac OS X, these commands will install MongoDB server and start it as a service:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;brew &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; mongodb
+brew services start mongodb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We are going to create a Scrapy pipeline so that each yielded item will get saved to MongoDB.
+This process is well documented in &lt;a href=&quot;https://doc.scrapy.org/en/latest/topics/item-pipeline.html?highlight=mongo#write-items-to-mongodb&quot;&gt;Scrapy&#39;s docs&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# pipelines.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; pymongo
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;MongoPipeline&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+
+    collection_name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;tc_posts&#39;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; mongo_uri&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; mongo_db&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_uri &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; mongo_uri
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_db &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; mongo_db
+
+    &lt;span class=&quot;token decorator annotation punctuation&quot;&gt;@classmethod&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;from_crawler&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;cls&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; crawler&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; cls&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            mongo_uri&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;crawler&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;MONGO_URI&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            mongo_db&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;crawler&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;MONGO_DATABASE&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;tc_scraper&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;open_spider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; pymongo&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;MongoClient&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_uri&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;db &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_db&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;close_spider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;close&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;process_item&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; item&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;db&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection_name&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;insert_one&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;item&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; item&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and activate it in the settings:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# settings.py&lt;/span&gt;
+
+ITEM_PIPELINES &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;token string&quot;&gt;&#39;tc_scraper.pipelines.MongoPipeline&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Last step is to install the new &lt;code&gt;pymongo&lt;/code&gt; dependency:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;pip3 &lt;span class=&quot;token function&quot;&gt;install&lt;/span&gt; pymongo&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can now re-run the spider:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;scrapy crawl techcrunch -a limit_pages=2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Feel free to open a mongo shell and check that the items were indeed inserted:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;mongo localhost/tc_scraper
+&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; db.tc_posts.count&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;token number&quot;&gt;40&lt;/span&gt;
+&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; db.tc_posts.&lt;span class=&quot;token function-name function&quot;&gt;findOne&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;token string&quot;&gt;&quot;_id&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;:&lt;/span&gt; ObjectId&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;5c09294a7fa9c70f84e43322&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;,
+	&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;https://techcrunch.com/2018/12/06/looker-looks-to-future-with-103m-investment-on-1-6b-valuation/&quot;&lt;/span&gt;,
+	&lt;span class=&quot;token string&quot;&gt;&quot;author&quot;&lt;/span&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;Ron Miller&quot;&lt;/span&gt;,
+
+  &lt;span class=&quot;token punctuation&quot;&gt;..&lt;/span&gt;.&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;update-existing-items&quot; tabindex=&quot;-1&quot;&gt;Update existing items &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;If you run the spider again, you will notice that you now have 80 items in your database.
+Let&#39;s update the Pipeline so that it does not insert a new post each time, but rather updates the existing one if it already exists.&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# pipelines.py&lt;/span&gt;
+
+&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;process_item&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; item&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;db&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection_name&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;find_one_and_update&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; item&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;$set&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;item&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            upsert&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;True&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; item&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we are using the url as the key, because unfortunately there does not seem to be a more canonical ID in the DOM.
+It should work as long as Techcrunch does not change their posts slugs or published dates often.&lt;/p&gt;
+&lt;p&gt;You can drop all items and re-run the spider twice:&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;db.tc_posts.drop();&quot;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; mongo localhost/tc_scraper
+scrapy crawl techcrunch &lt;span class=&quot;token parameter variable&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;limit_pages&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;
+scrapy crawl techcrunch &lt;span class=&quot;token parameter variable&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;limit_pages&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;
+&lt;span class=&quot;token builtin class-name&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;db.tc_posts.count();&quot;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;|&lt;/span&gt; mongo localhost/tc_scraper&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You should now have only 40 items in the database.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Note: If you are scared about running so many requests against Techcrunch.com, be aware that by default, Scrapy will use a &lt;a href=&quot;https://doc.scrapy.org/en/latest/topics/downloader-middleware.html#module-scrapy.downloadermiddlewares.httpcache&quot;&gt;cache&lt;/a&gt;.
+For most requests, it will not re-run them every single time, but instead re-use the previous response&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&quot;limit-crawls-to-new-items&quot; tabindex=&quot;-1&quot;&gt;Limit crawls to new items &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So far our solution is almost complete, but it will re-scrape all items every time you start it.
+In this step, we will make sure that we don&#39;t re-scrape items uselessly, in order to have faster scraping sessions, and to limit our requests rate to the website.&lt;/p&gt;
+&lt;p&gt;What we will do is to update the spider so that it prevents requests to items that were already scraped before and are in the database.&lt;/p&gt;
+&lt;p&gt;First let&#39;s extract the MongoDB connection logic from the pipeline in order to re-use it in the spider:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# mongo_provider.py (new file)&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; pymongo
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;MongoProvider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+
+    collection_name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;tc_posts&#39;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; uri&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; database&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_uri &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; uri
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_db &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; database &lt;span class=&quot;token keyword&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&#39;tc_scraper&#39;&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;get_collection&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; pymongo&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;MongoClient&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_uri&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_db&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection_name&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;close_connection&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;client&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;close&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and update the pipeline accordingly:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# pipelines.py&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; tc_scraper&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; MongoProvider
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;MongoPipeline&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; settings&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; MongoProvider&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;MONGO_URI&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;MONGO_DATABASE&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token decorator annotation punctuation&quot;&gt;@classmethod&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;from_crawler&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;cls&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; crawler&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; cls&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;crawler&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;settings&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;open_spider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get_collection&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;close_spider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;close_connection&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;process_item&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; item&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;find_one_and_update&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; item&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;$set&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;item&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            upsert&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;True&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; item&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;You can re-run the scraper at this checkpoint, nothing should have changed&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;We can now update the spider so that it uses this mongo provider:&lt;/p&gt;
+&lt;pre class=&quot;language-py&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-py&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# spiders/techcrunch.py&lt;/span&gt;
+
+&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;from&lt;/span&gt; tc_scraper&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider &lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; MongoProvider
+
+
+&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;TechcrunchSpider&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Spider&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+    &lt;span class=&quot;token decorator annotation punctuation&quot;&gt;@classmethod&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;from_crawler&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;cls&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; crawler&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;args&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;**&lt;/span&gt;kwargs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        kwargs&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;mongo_uri&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; crawler&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;MONGO_URI&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        kwargs&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;mongo_database&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; crawler&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;settings&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&#39;MONGO_DATABASE&#39;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;token builtin&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;TechcrunchSpider&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; cls&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;from_crawler&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;crawler&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;args&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;**&lt;/span&gt;kwargs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; limit_pages&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; mongo_uri&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; mongo_database&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;*&lt;/span&gt;args&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;**&lt;/span&gt;kwargs&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; MongoProvider&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;mongo_uri&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; mongo_database&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;mongo_provider&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get_collection&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        last_items &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;collection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;find&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;sort&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;published_at&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;limit&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;last_scraped_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; last_items&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;url&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; last_items&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;count&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;None&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; post &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;css&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;.post-block&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; url &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;last_scraped_url&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;reached last item scraped, breaking loop&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;yield&lt;/span&gt; scrapy&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Request&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; callback&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;parse_post&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is a quick breakdown of what we are doing here:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;In order to use the spider&#39;s settings that contain the mongo credentials, we need to do override this &lt;code&gt;from_crawler&lt;/code&gt; method. It&#39;s quite verbose, and not very intuitive. I agree it&#39;s annoying.&lt;/li&gt;
+&lt;li&gt;We then use these settings in the constructor to initialize a MongoDB connection thanks to our new &lt;code&gt;MongoProvider&lt;/code&gt; class.&lt;/li&gt;
+&lt;li&gt;We query Mongo for the last scraped item and store it&#39;s url.
+Here we are sorting the posts on the &lt;code&gt;published_at&lt;/code&gt; descendingly, we made sure that this is consistent with Techcrunch&#39;s sorting, or else our algorithm would not work properly.&lt;/li&gt;
+&lt;li&gt;In the parsing loop, we break and stop the scraping as soon as we reach a post with this url.
+We do it by preventing yielding the request, and breaking from the loop.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can now perform a few tests, drop some of the last items from MongoDB and re-scrape, you will see that it only scrapes the missing items and stops. Success!&lt;/p&gt;
+&lt;pre class=&quot;language-sh&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-sh&quot;&gt;mongo localhost/tc_scraper
+&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; last_item &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; db.tc_posts.find&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;.sort&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;published_at: -1&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; db.tc_posts.remove&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;_id: last_item&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&quot;_id&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; &lt;span class=&quot;token builtin class-name&quot;&gt;exit&lt;/span&gt;
+scrapy crawl techcrunch &lt;span class=&quot;token parameter variable&quot;&gt;-a&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;limit_pages&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&quot;conclusion&quot; tabindex=&quot;-1&quot;&gt;Conclusion &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;We now have a scraper that will do the least amount of work possible on each new run. I hope you enjoyed this tutorial, and that this gave you new ideas for scraping projects!&lt;/p&gt;
+&lt;p&gt;You can find the full code for this project here on GitHub: &lt;a href=&quot;https://github.com/adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb&quot;&gt;adipasquale/techcrunch-incremental-scrapy-spider-with-mongodb&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You can deploy your spider to &lt;a href=&quot;https://scrapinghub.com/scrapy-cloud&quot;&gt;ScrapingHub cloud&lt;/a&gt;, and schedule it to run daily on their servers.
+I&#39;m not affiliated to them in any way, it&#39;s just an awesome product and their free plan already does a lot.
+By the way, ScrapingHub is the main contributor to the fully open-source Scrapy project that we just used.&lt;/p&gt;
+&lt;p&gt;To go further, you can implement a new &lt;code&gt;force_rescrape&lt;/code&gt; argument, that will bypass our limit and force going through all the items again.
+This could be useful if you update the &lt;code&gt;scrape_post&lt;/code&gt; method, or if Techcrunch changes their DOM structure.&lt;/p&gt;
+&lt;p&gt;Let me know if you use this technique in one of your projects!&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://news.ycombinator.com/item?id=18697956&quot;&gt;Discuss on Hacker News&lt;/a&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Échelle des revenus en France</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/"/>
+		<updated>2018-12-07T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/</id>
+		<content type="html">&lt;ul&gt;
+&lt;li&gt;Édité le 25/12/2018 : &lt;a href=&quot;https://github.com/adipasquale/blog.dipasquale.fr/commit/4b3ca1f50debad7aa1d71d3bcbe7c9dd1197ba51&quot;&gt;&lt;em&gt;remarques de @Paul_Puget sur les interprétations&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Je me suis intéressé à tracer le graphique de l&#39;échelle des revenus en France.
+L&#39;idée est de pouvoir dire &amp;quot;si vous vivez avec tant d&#39;argent, vous êtes mieux loti que X% des français&amp;quot;.&lt;/p&gt;
+&lt;p&gt;C&#39;est une statistique qui m&#39;intéresse particulièrement car elle est simple à comprendre et permet de prendre du recul.
+En l&#39;occurence, cela peut permettre de mieux comprendre la contestation des &amp;quot;gilets jaunes&amp;quot;.&lt;/p&gt;
+&lt;h1 id=&quot;resultats&quot; tabindex=&quot;-1&quot;&gt;Résultats &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Avant toute chose, voici le résultat de mes analyses :&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IH67siQeIL-544.avif 544w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IH67siQeIL-544.webp 544w&quot;&gt;&lt;img alt=&quot;Revenus disponibles mensuels par unité de consommation&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/IH67siQeIL-544.png&quot; width=&quot;544&quot; height=&quot;495&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;De manière simplificatrice, on peut lire ce graphique comme cela : &lt;strong&gt;&amp;quot;si vous vivez avec 2500 euros par mois, vous êtes mieux loti que 80% des français&amp;quot;&lt;/strong&gt;.
+&lt;em&gt;Note : c&#39;est un langage approximatif&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Pour être précis, il faut bien préciser les termes employés ici. Voici les définitions de l&#39;INSEE :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Le &lt;a href=&quot;https://www.insee.fr/fr/metadonnees/definition/c1458&quot;&gt;revenu disponible&lt;/a&gt; d&#39;un ménage comprend les revenus d&#39;activité (nets des cotisations sociales), les revenus du patrimoine, les transferts en provenance d&#39;autres ménages et les prestations sociales (y compris les pensions de retraite et les indemnités de chômage), nets des impôts directs.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.insee.fr/fr/metadonnees/definition/c1802&quot;&gt;L&#39;unité de consommation&lt;/a&gt; est un Système de pondération attribuant un coefficient à chaque membre du ménage et permettant de comparer les niveaux de vie de ménages de tailles ou de compositions différentes. Avec cette pondération, le nombre de personnes est ramené à un nombre d&#39;unités de consommation (UC).
+Pour comparer le niveau de vie des ménages, on ne peut s&#39;en tenir à la consommation par personne. En effet, les besoins d&#39;un ménage ne s&#39;accroissent pas en stricte proportion de sa taille. Lorsque plusieurs personnes vivent ensemble, il n&#39;est pas nécessaire de multiplier tous les biens de consommation (en particulier, les biens de consommation durables) par le nombre de personnes pour garder le même niveau de vie.
+Aussi, pour comparer les niveaux de vie de ménages de taille ou de composition différente, on utilise une mesure du revenu corrigé par unité de consommation à l&#39;aide d&#39;une échelle d&#39;équivalence. L&#39;échelle actuellement la plus utilisée (dite de l&#39;OCDE) retient la pondération suivante :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1 UC pour le premier adulte du ménage ;&lt;/li&gt;
+&lt;li&gt;0,5 UC pour les autres personnes de 14 ans ou plus ;&lt;/li&gt;
+&lt;li&gt;0,3 UC pour les enfants de moins de 14 ans.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Donc, &lt;em&gt;en gros&lt;/em&gt;, on parle ici de &lt;strong&gt;l&#39;argent effectivement disponible dans chaque famille divisé par le nombre de personnes de manière dégressive&lt;/strong&gt; (toutes sources confondues et après impôts).&lt;/p&gt;
+&lt;p&gt;Les données utilisées proviennent de &lt;a href=&quot;https://www.insee.fr/fr/statistiques/3560118&quot;&gt;ce dossier&lt;/a&gt; de l&#39;INSEE paru le 19/06/2018 analysant des données de 2015 (plus de détails ci-dessous).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Vous trouverez des graphiques à d&#39;autres échelles géographiques à la &lt;a href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;fin de l&#39;article&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;h1 id=&quot;construction-de-l-analyse&quot; tabindex=&quot;-1&quot;&gt;Construction de l&#39;analyse &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;h2 id=&quot;recherche-des-donnees&quot; tabindex=&quot;-1&quot;&gt;Recherche des données &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Je me suis d&#39;abord rendu sur &lt;a href=&quot;https://www.data.gouv.fr/&quot;&gt;Data Gouv&lt;/a&gt; et j&#39;ai cherché avec des mots-clés comme &amp;quot;revenu médian&amp;quot;.
+J&#39;ai vite constaté que les résultats sont bien moins évidents que ce que j&#39;espérais, avec parfois un langage abscons.
+De plus, les liens pointant vers des données de l&#39;INSEE sont en partie cassés et redirigent vers la page d&#39;accueil.&lt;/p&gt;
+&lt;p&gt;Je me suis donc déplacé sur le site de l&#39;INSEE pour mes recherches.
+C&#39;est très compliqué de comprendre où chercher les informations sur ce grand site au vocabulaire nouveau pour moi.
+Il y a pléthore de documents, de fiches, de données, regroupées sous des noms d&#39;enquêtes très larges.
+Très dur de savoir vers quoi chercher.
+J&#39;ai alors utilisé mon joker à un ami et &lt;a href=&quot;https://twitter.com/AntoineAugusti&quot;&gt;@AntoineAugusti&lt;/a&gt; m&#39;a conseillé de ne pas hésiter à écrire à l&#39;INSEE pour qu&#39;ils m&#39;aiguillent.&lt;/p&gt;
+&lt;p&gt;J&#39;ai donc envoyé un message depuis le formulaire de contact et j&#39;ai effectivement reçu une réponse très efficace sous quelques jours :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Bonjour,&lt;/p&gt;
+&lt;p&gt;Vous trouverez la ventilation des revenus disponibles par commune,sous la rubrique Statistique, en sélectionnant les critères suivants :
+thèmes : Revenus – Pouvoir d&#39;achat – Consommation &amp;gt; Revenus – Niveaux de vie – Pouvoir d&#39;achat
+catégories : Données &amp;gt; Bases de données&lt;/p&gt;
+&lt;p&gt;Les données sont accessibles sur la page &lt;a href=&quot;https://www.insee.fr/fr/statistiques/3560118&quot;&gt;Structure et distribution des revenus, inégalité des niveaux de vie en 2015&lt;/a&gt;, puis dans le fichier &amp;quot;Base niveau communes en 2015 - y compris arrondissements municipaux&amp;quot;. Vous devez ensuite choisir le fichier &amp;quot;FILO_DISP_COM.xls&amp;quot;. La distribution par décile se situe dans l&#39;onglet &amp;quot;ensemble&amp;quot;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Cette réponse a été quasiment parfaite pour mon usage et m&#39;a débloqué pour la suite !&lt;/p&gt;
+&lt;h2 id=&quot;retour-sur-la-recherche-de-donnees&quot; tabindex=&quot;-1&quot;&gt;Retour sur la recherche de données &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Mon sentiment sur cette recherche de données est partagé.&lt;/p&gt;
+&lt;p&gt;D&#39;un côté je suis ébahi par la quantité et la qualité des données accessibles librement.
+Et aussi par la réponse parfaite dans un temps raisonnable de l&#39;INSEE à une demande d&#39;un particulier.&lt;/p&gt;
+&lt;p&gt;D&#39;un autre côté, je trouve ça dommage d&#39;avoir à faire une demande de support pour une recherche de statistique qui me paraît relativement &amp;quot;basique&amp;quot;.
+L&#39;expérience aurait été bien meilleure si j&#39;avais réussi à trouver moi-même ce que je cherchais.
+C&#39;est dommage que l&#39;intégration de Data Gouv avec l&#39;INSEE ne fonctionne pas, et je pense que beaucoup de choses pourraient être faites pour améliorer la recherche et l&#39;exploration au sein du site de l&#39;INSEE. Ça m&#39;a d&#39;ailleurs donné l&#39;idée d&#39;ouvrir un site mirroir ... plus dans un autre post !&lt;/p&gt;
+&lt;p&gt;Surtout, je pense que je n&#39;aurais jamais envoyé un message de support à l&#39;INSEE si mon ami qui connaît le milieu ne me l&#39;avait suggéré.
+Je ne me serais pas senti légitime, et/ou je n&#39;aurais jamais pensé recevoir une réponse aussi efficace rapidement.&lt;/p&gt;
+&lt;h2 id=&quot;construction-du-graphique&quot; tabindex=&quot;-1&quot;&gt;Construction du graphique &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Ça a été l&#39;occasion pour moi de re-découvrir pandas, que je n&#39;avais pas utilisé depuis longtemps.
+J&#39;ai aussi pu utiliser Jupyter, le successeur de iPython Notebook, que je ne connaissais pas.&lt;/p&gt;
+&lt;p&gt;La bonne surprise a été de voir que l&#39;installation de cet environnement complet de stats (numpy, pandas, Jupyter ...) sur mon OS X s&#39;est fait avec 3 commandes &lt;code&gt;pip3 install&lt;/code&gt;, sans aucun problème. J&#39;ai des souvenirs de cauchemards de dépendances ininstallables il y a quelques années.&lt;/p&gt;
+&lt;p&gt;Dans un premier temps, j&#39;ai travaillé sur le fichier indiqué par le support de l&#39;INSEE qui contient les données à l&#39;échelle communale. J&#39;ai voulu faire une moyenne des déciles, avant de me rendre compte que c&#39;était probablement une erreur statistique. J&#39;ai alors pensé pondérer les moyennes avec la population de chaque commune. Intuitivement, impossible de me décider sur la validité d&#39;une telle opération : &lt;strong&gt;est-ce qu&#39;on peut découper un ensemble en sous-ensembles, calculer les déciles sur ces sous-ensembles, et en faire la moyenne pondérée pour retomber sur les déciles de l&#39;ensemble global ?&lt;/strong&gt;. Je n&#39;ai pas trouvé la réponse sur internet, donc j&#39;ai fait des simulations dans un autre notebook pour me faire une idée. Et ça n&#39;a pas l&#39;air valide, on ne retombe pas sur les mêmes valeurs ! vous pouvez jouer avec ce notebook de tests &lt;a href=&quot;https://mybinder.org/v2/gh/adipasquale/france-income-disparities-2015/master?filepath=check%20weighted%20percentiles.ipynb&quot;&gt;sur Binder&lt;/a&gt; si ça vous intéresse.&lt;/p&gt;
+&lt;p&gt;J&#39;ai alors sorti le nez du guidon, pour me rendre compte qu&#39;il y avait un jeu de données voisin à échelle plus haute, notamment à l&#39;échelle nationale &lt;code&gt;FILO_DISP_METROPOLE.xls&lt;/code&gt;. C&#39;est beaucoup plus facile comme ça !&lt;/p&gt;
+&lt;p&gt;Le reste est un &amp;quot;jeu d&#39;enfants&amp;quot; qui m&#39;a quand même pris quelques heures pour me rappeler comment manipuler les DataFrame et le plotting.&lt;/p&gt;
+&lt;p&gt;Vous pouvez trouver le code source du Notebook Jupyter sur &lt;a href=&quot;https://github.com/adipasquale/france-income-disparities-2015&quot;&gt;GitHub&lt;/a&gt;, et aussi en lancer une version interactive avec Binder &lt;a href=&quot;https://mybinder.org/v2/gh/adipasquale/france-income-disparities-2015/master?filepath=revenus%20disponibles%20france%20metropolitaine%20-%20deciles.ipynb&quot;&gt;en suivant ce lien&lt;/a&gt;.&lt;/p&gt;
+&lt;h1 id=&quot;par-region-et-par-commune&quot; tabindex=&quot;-1&quot;&gt;&lt;a name=&quot;regions&quot;&gt;&lt;/a&gt;Par région et par commune &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Dans les données disponibles, on a le détail à différentes échelles, dont l&#39;échelle régionale et l&#39;échelle communale.&lt;/p&gt;
+&lt;h2 id=&quot;par-region&quot; tabindex=&quot;-1&quot;&gt;Par région &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Voici ce que ça donne région par région :&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/u42YsvgEBU-923.avif 923w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/u42YsvgEBU-923.webp 923w&quot;&gt;&lt;img alt=&quot;Revenus disponibles mensuels par unité de consommation par région&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/u42YsvgEBU-923.png&quot; width=&quot;923&quot; height=&quot;710&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;C&#39;est un peu illisible, j&#39;ai isolé de manière un peu arbitraire les extrêmes  :&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/8a3U-7Vqj7-644.avif 644w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/8a3U-7Vqj7-644.webp 644w&quot;&gt;&lt;img alt=&quot;Revenus disponibles mensuels par unité de consommation par région, seulement les extrêmes&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/8a3U-7Vqj7-644.png&quot; width=&quot;644&quot; height=&quot;601&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;On voit des différences de répartition importantes et surtout des inégalités de niveaux de vie très marquées.&lt;/p&gt;
+&lt;h2 id=&quot;au-sein-de-paris&quot; tabindex=&quot;-1&quot;&gt;Au sein de Paris &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Ensuite, j&#39;ai regardé à l&#39;échelle des communes. On ne peut évidemment pas envisager de tracer le graphique pour les 36000 communes françaises et quelques, il faut donc faire des choix.&lt;/p&gt;
+&lt;p&gt;J&#39;ai d&#39;abord regardé les différences entre les différents arrondissements de Paris. Avec 20 arrondissements, le graphique est illisible, le voici avec les 4 arrondissements ayant respectivement les 2 taux d&#39;inégalités les plus forts et les plus faibles (mesurés par &lt;a href=&quot;https://www.insee.fr/fr/metadonnees/definition/c1551&quot;&gt;l&#39;indice de Gini&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/brHZJXQAmW-554.avif 554w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/brHZJXQAmW-554.webp 554w&quot;&gt;&lt;img alt=&quot;Revenus disponibles mensuels par unité de consommation par région&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/brHZJXQAmW-554.png&quot; width=&quot;554&quot; height=&quot;492&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;Et non, ce n&#39;est pas le 16ème qui a le plus haut taux d&#39;inégalité, mais bien le 7ème ! (le 16ème est 3ème). Les différences sont extrèmement marquées avec les deux arrondissements à l&#39;extrême opposé. On note que le 1er décile est quasiment identique : les ménages ayant le moins de revenu en ont à peu près autant dans le 7ème que dans le 20ème. Et on voit aussi de manière flagrante que &lt;strong&gt;les ménages ayant le plus de revenus en ont environ 3 fois plus à Paris 7ème qu&#39;à Paris 20ème&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mise à jour&lt;/strong&gt;: &lt;a href=&quot;https://twitter.com/Paul_Puget&quot;&gt;@Paul_Puget&lt;/a&gt; m&#39;a fait remarquer que mon interprétation est erronée. On peut effectivement lire que le dernier décile est environ trois fois plus élevé. On ne peut cependant pas en tirer de conclusions sur les revenus moyens de ces 10% de gens les plus riches. Il n&#39;est pas impossible que le revenu moyen dans ce dernier décile soit plus élevé dans le 20ème que dans le 7ème, cf &lt;a href=&quot;https://imgur.com/a/adr4V8Y&quot;&gt;ce petit schéma à la main&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;par-ville&quot; tabindex=&quot;-1&quot;&gt;Par ville &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Enfin j&#39;ai regardé les communes à l&#39;échelle nationale. J&#39;ai filtré les données pour voir les grandes villes uniquement, en utilisant cette règle : &amp;quot;nombre de personnes dans les ménages fiscaux supérieur à 100000&amp;quot;.&lt;/p&gt;
+&lt;p&gt;Voici un graphique représentant 5 villes choisies arbitrairement pour représenter la &amp;quot;palette&amp;quot; de répartition des revenus : Paris (taux d&#39;inégalité le plus fort), Marseille, Brest (taux d&#39;inégalité le plus faible), Toulouse et Lyon.&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/FtMHLDqUnQ-545.avif 545w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/FtMHLDqUnQ-545.webp 545w&quot;&gt;&lt;img alt=&quot;Revenus disponibles mensuels par unité de consommation par communes&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/FtMHLDqUnQ-545.png&quot; width=&quot;545&quot; height=&quot;492&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;Là encore, on voit un schéma similaire, c&#39;est-à-dire que les écarts se produisent principalement dans les déciles les plus hauts. Je pense que l&#39;on peut lire cela comme ça : &lt;strong&gt;&amp;quot;Les écarts de répartitions des richesses dans les grandes villes françaises se concentrent dans les classes les plus aisées&amp;quot;.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mise à jour&lt;/strong&gt;: Ici encore, &lt;a href=&quot;https://twitter.com/Paul_Puget&quot;&gt;@Paul_Puget&lt;/a&gt; a relevé que cette interprétation est un peu hâtive. Le graphique permet de voir l’évolution selon les différents déciles des écarts absolus de revenus entre les différentes villes. Mais on ne peut pas vraiment y lire l’évolution des rapports entre ces revenus de différentes villes. Peut-être que le rapport entre les revenus disponibles à Marseille et à Paris et le même pour le premier décile et le dernier, par exemple 0,8. On peut difficilement le lire sur ce graphique en tout cas.&lt;/p&gt;
+&lt;h1 id=&quot;conclusion&quot; tabindex=&quot;-1&quot;&gt;Conclusion &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-07-echelle-des-revenus-en-france/&quot;&gt;#&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;J&#39;espère que comme moi vous avez appris des choses, et surtout que ça vous a donné envie d&#39;en savoir plus. Je vous invite à visiter le site de &lt;a href=&quot;https://www.insee.fr/&quot;&gt;l&#39;INSEE&lt;/a&gt; et celui de &lt;a href=&quot;https://www.data.gouv.fr/&quot;&gt;Data Gouv&lt;/a&gt; pour chercher des données intéressantes. J&#39;ai plein d&#39;idées pour d&#39;autres analyses, notamment avec l&#39;indice de Gini, si ça vous intéresse suivez-moi sur Twitter : &lt;a href=&quot;https://twitter.com/hypertextadrien&quot;&gt;@hypertextadrien&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Et surtout n&#39;hésitez pas à me contacter si vous avez des questions, ou si vous avez repéré des erreurs dans les manipulations de données ou dans mes interprétations !&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Leave Gmail in 10 steps</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/"/>
+		<updated>2018-12-02T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/</id>
+		<content type="html">&lt;ul&gt;
+&lt;li&gt;updated on 25/12/2018 : &lt;a href=&quot;https://github.com/adipasquale/blog.dipasquale.fr/commit/93819a06f0551f01ec4304ba76c83705f38fbb36&quot;&gt;&lt;em&gt;added link to Fastmail&#39;s post about AABill&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In exchange for free mails, would you let your postman open your letters, read them, and insert ads related to their contents?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This is a common analogy for Gmail&#39;s model. The privacy implications of using Gmail actually go much farther than that, because Gmail is not only your postman (with Gmail), it also owns your car ( your web browser), your address book (with Search), your TV (with YouTube), it&#39;s a great land owner (with AdSense)… And there are many reasons not to trust Google, &lt;a href=&quot;http://precursorblog.com/?q=content/googles-top-35-privacy-scandals&quot;&gt;especially with your privacy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Important edit&lt;/strong&gt;: As many commenters pointed out, this analogy is actually not correct anymore, as &lt;a href=&quot;https://techcentral.co.za/google-will-stop-reading-e-mail/75215/&quot;&gt;Google stopped reading your emails for ad-personalization&lt;/a&gt; in 2017, sorry I missed that news. However, they &lt;a href=&quot;https://theoutline.com/post/4524/remember-when-google-said-it-would-stop-reading-your-email&quot;&gt;do still read&lt;/a&gt; them in order to &amp;quot;customize search results, better detect spam and malware&amp;quot;.&lt;/p&gt;
+&lt;p&gt;Migrating away from any email service, like changing addresses in real world life, is always going to be tedious. I did not find that Gmail makes it particularly harder, but I hope this guide can help you.&lt;/p&gt;
+&lt;p&gt;Disclaimer : This guide will not help you find alternatives for the Gmail-specific features, like labels, snoozing, bundles, suggested replies and so on.&lt;/p&gt;
+&lt;h2 id=&quot;step-1-get-a-new-mail-address-and-provider&quot; tabindex=&quot;-1&quot;&gt;Step 1 : Get a new mail address and provider &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;First, I strongly suggest you buy a domain name, so that you really own your mail address, and don&#39;t depend on any service. You can purchase one at &lt;a href=&quot;https://www.gandi.net/&quot;&gt;Gandi&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;From there on, you could use Gandi&#39;s mail servers, but I recommend you use &lt;a href=&quot;https://fastmail.com/&quot;&gt;Fastmail&#39;s&lt;/a&gt;. It&#39;s not free, but it will be much simpler to setup, faster, they provide push notifications for mobile, their spam filter is better, their web interface is better, and it&#39;s the most popular privacy-respecting service.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Edit&lt;/strong&gt;: I am not affiliated to Fastmail in any way, and I do not want this article to look like an ad!
+Also, as &lt;a href=&quot;https://news.ycombinator.com/item?id=18633216&quot;&gt;HN commenters&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/mediafinger/status/1071325185364672513&quot;&gt;@mediafinger&lt;/a&gt; pointed out, Fastmail is an Australian company, where they just passed &lt;a href=&quot;https://www.nytimes.com/2018/12/06/world/australia/encryption-bill-nauru.html&quot;&gt;a new bill&lt;/a&gt;, which is concerning for privacy.
+Fastmail stated &lt;a href=&quot;https://fastmail.blog/2018/12/21/advocating-for-privacy-aabill-australia/&quot;&gt;in a blog post&lt;/a&gt;  that this law does not impact them though.
+Have a look at other privacy-caring providers like &lt;a href=&quot;https://mailbox.org/&quot;&gt;mailbox.org&lt;/a&gt;, &lt;a href=&quot;https://runbox.com/&quot;&gt;runbox.com&lt;/a&gt;,&lt;a href=&quot;https://posteo.de/&quot;&gt;posteo.de&lt;/a&gt; and &lt;a href=&quot;https://www.startmail.com/&quot;&gt;startmail.com&lt;/a&gt;, they may very well be cheaper too.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.fastmail.com/signup/&quot;&gt;Signing up with Fastmail&lt;/a&gt; is very simple. If you bought a domain name, you can use their &lt;a href=&quot;https://www.fastmail.com/help/receive/domains-setup-nsmx.html&quot;&gt;easy-setup option&lt;/a&gt; where you use their name servers and they do all the hardlifting. You will still be able to add custom DNS entries later if you want to, for your personal website or blog. If you did not buy a domain name, you can also create a mail address ending with one of theirs : sent.com, fastmail.com…&lt;/p&gt;
+&lt;h2 id=&quot;step-2-clients-setup-and-update-round&quot; tabindex=&quot;-1&quot;&gt;Step 2 : Clients setup and update round &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;By client, here, I mean the applications that you use to read and write mail. Gmail has both a web client (a website) and mobile apps.&lt;/p&gt;
+&lt;p&gt;There are lots of options for mail clients. Fastmail comes with a web client too, that is quite different from Gmail and less featureful, but it works well.&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/c2DoVPlMNU-800.avif 800w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/c2DoVPlMNU-800.webp 800w&quot;&gt;&lt;img alt=&quot;Fastmail&#39;s web interface&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/c2DoVPlMNU-800.png&quot; width=&quot;800&quot; height=&quot;540&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;Windows 10+, OS X and iOS come with decent native mail clients, I suggest you start with these. Android on the other hand now has Gmail as the default mail app, so you will have to try a new one. Fastmail has some &lt;a href=&quot;https://www.fastmail.com/help/clients/applist.html&quot;&gt;great guides&lt;/a&gt; for setupping these mail clients and it&#39;s sometimes as easy as scanning a personalized QR-Code.&lt;/p&gt;
+&lt;p&gt;You can try sending a mail from your Gmail to your new mail and check that you are receiving it on all the devices that you care about. Once you are up and running with your new address, it&#39;s the perfect moment to try and update your mail address on the services you use daily (Social networks, Github, Amazon…). If you use a password manager it can help you identify the services you have forgot.&lt;/p&gt;
+&lt;h2 id=&quot;step-3-delete-useless-mails-from-gmail&quot; tabindex=&quot;-1&quot;&gt;Step 3 : Delete useless mails from Gmail &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I strongly suggest that you take the time to clean up the clutter you have accumulated in your Gmail before anything. Here are some reasons to do so :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;migrating your mails will be faster&lt;/li&gt;
+&lt;li&gt;you will not reach the storage limit on your new provider as fast&lt;/li&gt;
+&lt;li&gt;it feels good :)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It’s important to do it before migrating or else you’ll be cleaning up 2 mailboxes (I did and lost a lot of time).&lt;/p&gt;
+&lt;p&gt;Look at your space usage for mail on &lt;a href=&quot;https://drive.Google.com/settings/storage&quot;&gt;this Google page&lt;/a&gt;, by clicking on the details link. If it looks reasonable, you may skip this step.&lt;/p&gt;
+&lt;p&gt;The first way to find useless mails is easy : look for mails with big attachments. You can use this Gmail search query &lt;code&gt;size:5MB&lt;/code&gt; or any other threshold.&lt;/p&gt;
+&lt;p&gt;The second way is trickier : you want to look for redundant, similar mails : facebook notifications, Google alerts, GitHub comments… This can represent a very high number of mail and thus of space. Surprisingly I could not find a good tool to identify these mails. It cannot be done with Google queries. There is a plug-in in Thunderbird but it was very buggy for me and opening Thunderbird feels like travelling back to the 90s 😢 The best way I found was to use python&#39;s mbox files support out of the box. I published a small script called &lt;a href=&quot;https://github.com/adipasquale/mbox-sender-frequency&quot;&gt;mbox-sender-frequency&lt;/a&gt;. It lists all addresses that have sent over 100 mails to you. You can then filter and drop them on Gmail.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/isCPq3N.png&quot; alt=&quot;example usage of mbox-sender-frequency&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;step-4-export-your-data-from-google-and-archive-it&quot; tabindex=&quot;-1&quot;&gt;Step 4 : Export your data from Google and archive it &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I have to hand it out to Google they make it quite easy to export your mails. Head to &lt;a href=&quot;https://takeout.Google.com&quot;&gt;Google Takeout&lt;/a&gt; and select mails. You’ll need to have it locally so I suggest you take the download option. They’ll mail you a link once they have gathered it all in a nice mbox file.&lt;/p&gt;
+&lt;p&gt;I suggest you store this mbox archive somewhere safe, ie. not a hard drive :) I went with S3 Cloud Storage. You want to keep this file for a long while, maybe a year or so.&lt;/p&gt;
+&lt;h2 id=&quot;step-5-migrate-all-mails&quot; tabindex=&quot;-1&quot;&gt;Step 5 : Migrate all mails &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Important : &lt;strong&gt;do not yet use Fastmail&#39;s Identities &amp;amp; Fetch feature&lt;/strong&gt;. It would be slower and less reliable at this point.&lt;/p&gt;
+&lt;p&gt;Fastmail has a very nice Email import tool, that will fetch mail from Google&#39;s IMAP servers and import them to your new account. To use it, follow &lt;a href=&quot;https://www.fastmail.com/help/receive/migratemail.html&quot;&gt;these very clear instructions by Fastmail&lt;/a&gt;. Do use the &#39;no duplicate&#39; checkbox, because mails with labels would be fetched multiple times otherwise.&lt;/p&gt;
+&lt;p&gt;This step can take a while, a whole night for me. Once it&#39;s done, do give a look at the logs as you do not want to miss anything. You should also have a look at your mails, browsing to the oldest is a good idea.&lt;/p&gt;
+&lt;h2 id=&quot;step-6-delete-all-migrated-mails-from-gmail&quot; tabindex=&quot;-1&quot;&gt;Step 6 : Delete all migrated mails from Gmail &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Once you are confident you have everything on your new account and have backed up the archive file, you may go back to  and delete all your mails. That is a very thrilling step!&lt;/p&gt;
+&lt;p&gt;Note : Because the migration process takes a while, you may have received mail to your Gmail account between steps 5 and 6, and that mail was not migrated to your new account. In that case, you may want to limit the mails you are deleting using a search filter.&lt;/p&gt;
+&lt;h2 id=&quot;step-7-synchronize-future-gmail-mails-to-fastmail&quot; tabindex=&quot;-1&quot;&gt;Step 7 : Synchronize future Gmail mails to Fastmail &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;You can now setup the &lt;a href=&quot;https://www.fastmail.com/help/receive/fetchotheremail.html&quot;&gt;Identities &amp;amp; Fetch&lt;/a&gt; feature with your Gmail account. All the mails received during the migration, and the future incoming ones to Gmail will now be synchronized to your new account. You can also setup a sender alias to write mails with your old Gmail address, if necessary.&lt;/p&gt;
+&lt;p&gt;You are ready to remove the Gmail apps from all your devices, you are almost free!&lt;/p&gt;
+&lt;h2 id=&quot;step-8-monitor-mails-still-sent-to-your-gmail-account&quot; tabindex=&quot;-1&quot;&gt;Step 8 : Monitor mails still sent to your Gmail account &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The idea is to reduce more and more the mails you receive to your Gmail address. To do so, you can search &lt;code&gt;to:youroldaddress@.com&lt;/code&gt; on Fastmail web interface, and save it. Then, go check out the results regularly and try and make sure that you will not receive similar mails in the future.&lt;/p&gt;
+&lt;p&gt;If it’s an automated mail from a service you use, go update your address (or unsubscribe !). If it’s from a person, then let them know you have changed your mail address.&lt;/p&gt;
+&lt;h2 id=&quot;step-9-actually-close-your-gmail-account&quot; tabindex=&quot;-1&quot;&gt;Step 9 : Actually close your Gmail account &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Once you are not receiving any more mail to your Gmail address (or barely) you can take the big step and close your Gmail account.&lt;/p&gt;
+&lt;p&gt;You can follow &lt;a href=&quot;https://support.Google.com/accounts/answer/61177&quot;&gt;Google&#39;s guide&lt;/a&gt; to do so. Some nice facts are that your address may never be used by anyone in the future, and that your Google Account will not be deleted in the same time.&lt;/p&gt;
+&lt;p&gt;I&#39;m a cheater : I have not actually gone through this step yet. I think I will wait at least one year in order to be sure I&#39;m not receiving any import mail to my Gmail address.&lt;/p&gt;
+&lt;h2 id=&quot;step-10-go-the-extra-mile&quot; tabindex=&quot;-1&quot;&gt;Step 10 : Go the extra mile &lt;a class=&quot;header-anchor&quot; href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2018-12-02-leave-gmail-in-10-steps/&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;While you are at it you may want to try and replace other Google services.&lt;/p&gt;
+&lt;p&gt;Natural followers are the Calendar and Contacts apps. These are two pieces of sensitive data that you can very easily export from Google and import into your new Fastmail account. Then you can again replace the Google Calendar and Google Contacts apps with alternatives. The Apple ones have proven far good enough for my usage.&lt;/p&gt;
+&lt;p&gt;If you want to go further, you can check the &lt;a href=&quot;https://nomoregoogle.com/&quot;&gt;No More Google list&lt;/a&gt; to find popular alternatives to Google Services.&lt;/p&gt;
+&lt;p&gt;&lt;picture&gt;&lt;source type=&quot;image/avif&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/F9MUgSIHUm-429.avif 429w&quot;&gt;&lt;source type=&quot;image/webp&quot; srcset=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/F9MUgSIHUm-429.webp 429w&quot;&gt;&lt;img alt=&quot;no more google&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot; src=&quot;https://www.dipasquale.fr/eleventy-base-blog/img/F9MUgSIHUm-429.png&quot; width=&quot;429&quot; height=&quot;77&quot;&gt;&lt;/picture&gt;&lt;/p&gt;
+&lt;p&gt;I was very surprised how easy it was to stop using Google Chrome. The new Firefox is fast, almost bug free, and has all the web development tools I need. I was also using Chrome on my iPhone but I like Safari more now that I have switched. The transition was smooth and intuitive and it’s obviously better integrated with iOS.&lt;/p&gt;
+&lt;p&gt;The only Google apps I really could not stop using are Maps and Docs. They both have features I could not find anywhere else and which I don&#39;t want to stop using altogether.&lt;/p&gt;
+&lt;p&gt;I hope this helps, let me know if you switch!&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;You can comment this article on &lt;a href=&quot;https://news.ycombinator.com/item?id=18627509&quot;&gt;Hacker News&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Designing state machines</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2017-06-26-designing-state-machines/"/>
+		<updated>2017-06-26T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2017-06-26-designing-state-machines/</id>
+		<content type="html">&lt;p&gt;This is a post I wrote while I was working at Drivy, as we were tweaking the models state machines. You can find it here : &lt;a href=&quot;https://drivy.engineering/designing-state-machines/&quot;&gt;https://drivy.engineering/designing-state-machines/&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As a TLDR; this post suggests :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Keep it as simple as possible&lt;/li&gt;
+&lt;li&gt;Talk with all your team-mates to understand the vocabulary&lt;/li&gt;
+&lt;li&gt;Do not over-anticipate your future needs&lt;/li&gt;
+&lt;li&gt;Store all relevant infos including the transitions from state to state&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I initially presented these tips as a lightning talk for the &lt;a href=&quot;https://www.meetup.com/fr-FR/parisrb/events/rqtgrlyvkbhb/&quot;&gt;ParisRb meetup on 05/07/2016&lt;/a&gt;. You can find my slides here : &lt;a href=&quot;https://adipasquale.github.io/state-machines-lightning-talk&quot;&gt;https://adipasquale.github.io/state-machines-lightning-talk&lt;/a&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Taskqueues tips</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2017-03-13-taskqueues-tips/"/>
+		<updated>2017-03-13T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2017-03-13-taskqueues-tips/</id>
+		<content type="html">&lt;p&gt;I wrote a post listing a few tips to write a taskqueue while I was working at Drivy. You can find it here : &lt;a href=&quot;https://drivy.engineering/taskqueues-tips/&quot;&gt;https://drivy.engineering/taskqueues-tips/&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As a TLDR; this post suggests :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Writing re-entrant idempotent tasks that require the least number of arguments possible&lt;/li&gt;
+&lt;li&gt;Avoid class-level calls&lt;/li&gt;
+&lt;li&gt;Avoid mutable instance variables&lt;/li&gt;
+&lt;li&gt;Specialize your workers for more efficiency&lt;/li&gt;
+&lt;li&gt;Queues should be designed by speed and urgency, not semantically&lt;/li&gt;
+&lt;li&gt;Read carefully your message broker&#39;s doc (Redis, RabbitMQ ...) and monitor it&lt;/li&gt;
+&lt;li&gt;Also monitor your queues SLAs, your worker&#39;s memory and exceptions, and your CRON&lt;/li&gt;
+&lt;li&gt;Check your DB connection pool&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I also spoke about this in a meetup talk, you can find the slides here : &lt;a href=&quot;https://adipasquale.github.io/taskqueues-slides-2015&quot;&gt;https://adipasquale.github.io/taskqueues-slides-2015&lt;/a&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Capsitrano Environment variables</title>
+		<link href="https://www.dipasquale.fr/eleventy-base-blog/blog/2013-02-20-capistrano-environment-variables/"/>
+		<updated>2013-02-20T00:00:00Z</updated>
+		<id>https://www.dipasquale.fr/eleventy-base-blog/blog/2013-02-20-capistrano-environment-variables/</id>
+		<content type="html">&lt;p&gt;This is the story of an epic fight. Me (regular guy) vs the server (Rails 3, deployed via Capistrano to a Passenger – Nginx hosted Ubuntu server, using Mandrill transactional mail service). not a fair fight.&lt;/p&gt;
+&lt;p&gt;If you already know the deal (or just don’t want to hear me whine) jump &lt;a href=&quot;https://www.dipasquale.fr/eleventy-base-blog/blog/2013-02-20-capistrano-environment-variables/&quot;&gt;there&lt;/a&gt; for the Capistrano task that’ll magically expand your environment variables in the config.&lt;/p&gt;
+&lt;p&gt;First if you follow Mandrill’s &lt;a href=&quot;https://help.mandrill.com/entries/21738467-Using-Mandrill-s-SMTP-integration-with-Web-Frameworks&quot;&gt;guide&lt;/a&gt; (spoiler: you should not), this is what you’d set up in your config/production.rb :&lt;/p&gt;
+&lt;pre class=&quot;language-ruby&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-ruby&quot;&gt;config&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;action_mailer&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;smtp_settings &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:address&lt;/span&gt;   &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;smtp.mandrillapp.com&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:port&lt;/span&gt;      &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;587&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:enable_starttls_auto&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:user_name&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;MANDRILL_USERNAME&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:password&lt;/span&gt;  &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;MANDRILL_API_KEY&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token symbol&quot;&gt;:authentication&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&#39;login&#39;&lt;/span&gt;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I know your extra picky security cerebrum already picked up the issue with this. hardcoding the username and password in your config file cannot be a good idea, especially if you’re sharing your code with many people. A better way is to use environment variables.&lt;/p&gt;
+&lt;pre class=&quot;language-ruby&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-ruby&quot;&gt;&lt;span class=&quot;token symbol&quot;&gt;:user_name&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token constant&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;MANDRILL_USERNAME&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;token symbol&quot;&gt;:password&lt;/span&gt;  &lt;span class=&quot;token operator&quot;&gt;=&gt;&lt;/span&gt; &lt;span class=&quot;token constant&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;MANDRILL_API_KEY&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you then have to set these variables on your prod server, in /etc/profile for example :&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token builtin class-name&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;MANDRILL_USERNAME&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;foo
+&lt;span class=&quot;token builtin class-name&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;token assign-left variable&quot;&gt;MANDRILL_API_KEY&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;bar&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, it can’t be that simple, right ? right.
+Whereas my mails were not sent, the logger did not give me any errors, so first things first, I figured I’d turn the failed mail deliveries warning on in config/production.rb :&lt;/p&gt;
+&lt;pre class=&quot;language-ruby&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-ruby&quot;&gt;config&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;action_mailer&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;raise_delivery_errors &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;true&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;if you’re doing this live on your production server (and you should) you have to restart Passenger :&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token function&quot;&gt;touch&lt;/span&gt; tmp/restart.txt&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And I could now see a beautiful &lt;code&gt;Net::SMTPServerBusy, Relay access denied error&lt;/code&gt;. First I believed it came from a blocked 587 port, got postfix to work, and everything worked fin, hmmm. Heck, it even worked when I launched a thin server on the prod !
+This &lt;a href=&quot;https://stackoverflow.com/questions/13963795/rails-mailer-netsmtpserverbusy&quot;&gt;Stack Overflow&lt;/a&gt; entry showed me the way to the problem : Passenger doesn’t set your environment variables when you fire it up.&lt;/p&gt;
+&lt;p&gt;One solution is to load your variables in the wrapper around Ruby interpreter that Passenger uses (more info on this &lt;a href=&quot;https://blog.rayapps.com/2008/05/21/using-mod_rails-with-rails-applications-on-oracle/&quot;&gt;here&lt;/a&gt;). I don’t like this idea much, it feels very hacky, what’ll happen when I’ll upgrade my Ruby for example ?&lt;/p&gt;
+&lt;p&gt;My solution is to expand the variables in your config file during the deploy (meaning replacing ENV[“MANDRILL_USERNAME”] with the actuall username value, copied from the environment variable).
+This amazing &lt;a href=&quot;https://stackoverflow.com/questions/1609423/using-sed-to-expand-environment-variables-inside-files#answer-1610500&quot;&gt;SO answer&lt;/a&gt; helped a lot, I tweaked it a bit to fit a Capistrano deploy task. It will expand ANY of your environment variables, how great is that ?!&lt;/p&gt;
+&lt;p&gt;Warning: this is some mad-ass syntax, even the built-in highlighter can’t figure it out. There’s a LOT of escaping, between sed syntax and ruby’s …&lt;/p&gt;
+&lt;pre class=&quot;language-ruby&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-ruby&quot;&gt;desc &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;Replace environment variables with hardcoded values in config file&quot;&lt;/span&gt;&lt;/span&gt;
+task &lt;span class=&quot;token symbol&quot;&gt;:replace_env_vars&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token symbol&quot;&gt;roles&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token symbol&quot;&gt;:app&lt;/span&gt; &lt;span class=&quot;token keyword&quot;&gt;do&lt;/span&gt;
+  run &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;mv &lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/config/environments/production.rb &lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/config/environments/production.before_sed.rb&quot;&lt;/span&gt;&lt;/span&gt;
+  run &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&#39;env | sed &#92;&#39;s/[&#92;%]/&#92;&#92;&amp;amp;amp;/g;s/&#92;([^=]*&#92;)=&#92;(.*&#92;)/s%ENV&#92;&#92;&#92;[&#92;&#92;&#92;&quot;&#92;1&#92;&#92;&#92;&quot;&#92;&#92;&#92;]%&#92;&quot;&#92;2&#92;&quot;%/&#92;&#39; &gt; &#39;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/script/expand_env_vars.sed.script&quot;&lt;/span&gt;&lt;/span&gt;
+  run &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;cat &lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/config/environments/production.before_sed.rb | sed -f &lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/script/expand_env_vars.sed.script &gt; &lt;/span&gt;&lt;span class=&quot;token interpolation&quot;&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;token content&quot;&gt;release_path&lt;/span&gt;&lt;span class=&quot;token delimiter punctuation&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;/config/environments/production.rb&quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class=&quot;token keyword&quot;&gt;end&lt;/span&gt;
+
+after &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;deploy:update_code&quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string-literal&quot;&gt;&lt;span class=&quot;token string&quot;&gt;&quot;deploy:replace_env_vars&quot;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note : this will only replace strings that use double quotes like &lt;code&gt;ENV[“JESSICA_ALBA_PHONE_NUMBER”]&lt;/code&gt; (I gather you wouldn’t share that piece of intel with any other developer)&lt;/p&gt;
+&lt;p&gt;Hey, lucky you ! There’s a last step, and it’s so easy it feels good. By default, the SSH session opened by Capistrano doesn’t execute your init scripts (~/.profile, ~/.bashrc, not even /etc/profile/). These are &lt;a href=&quot;https://pretheory.wordpress.com/2008/02/12/capistrano-path-and-environment-variable-issues/&quot;&gt;DanM instructions&lt;/a&gt; (cheers !) to load them up. Create &lt;code&gt;~/.ssh/environment&lt;/code&gt; and reput the export instructions, or you can even load your whole &lt;code&gt;/etc/profile&lt;/code&gt; file, even though I have no idea what the security implications are. just don’t if you are ignorant like me.
+Tell your SSH server to load this file : add this line in &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PermitUserEnvironment yes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and restart it with&lt;/p&gt;
+&lt;pre class=&quot;language-shell&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-shell&quot;&gt;&lt;span class=&quot;token function&quot;&gt;sudo&lt;/span&gt; /etc/init.d/ssh restart&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That should make your day. If it does not, feel free to let out your sorrow in the comments.&lt;/p&gt;
+</content>
+	</entry>
+</feed>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Build and deploy huge static websites with Caddy</title>
+		<meta name="description" content="Adrien Di Paquale personal website">
+
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Adrien">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Adrien">
+		<meta name="generator" content="Eleventy v2.0.1">
+
+		<link rel="stylesheet" href="/eleventy-base-blog/css/new.css">
+		<link rel="stylesheet" href="/eleventy-base-blog/css/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="#skip" class="visually-hidden">Skip to main content</a>
+			<h1>Adrien</h1>
+			<h2 class="visually-hidden">Menu</h2>
+			<nav>
+					<a href="/eleventy-base-blog/">
+						Home
+					</a>
+					<a href="/eleventy-base-blog/blog/">
+						Blog
+					</a>
+					<a href="/eleventy-base-blog/pianopiano/">
+						Piano Piano
+					</a>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+
+<link rel="stylesheet" href="/eleventy-base-blog/css/prism-okaidia.css">
+
+<h1>Build and deploy huge static websites with Caddy</h1>
+
+<p>
+	<time datetime="2018-12-27">
+		27 December 2018
+	</time>
+</p>
+
+<hr>
+
+
+
+<p>I will show you how to setup the hosting and deployment of a static website with thousands of pages dynamically built. It uses the <a href="https://caddyserver.com/">Caddy web server</a> and a <a href="https://digitalocean.com/">Digital Ocean</a>'s droplet - but it would work with any Ubuntu server.</p>
+<h1 id="introduction" tabindex="-1">Introduction <a class="header-anchor" href="#introduction">#</a></h1>
+<h2 id="first-of-all-don-t-do-it" tabindex="-1">First of all, don't do it! <a class="header-anchor" href="#first-of-all-don-t-do-it">#</a></h2>
+<p>There are very few cases where it makes sense to use such a setup.
+<a href="https://www.netlify.com/">Netlify</a>, among others, is a great hosting provider for static websites.
+It is way simpler to setup, it can run custom build scripts, it gives you HTTPS out of the box, and CDN delivery.
+All that for free!
+So really, try building your website there first.</p>
+<p>In some cases though, you may reach Netlify's limits.
+I personally experienced failures on Netlify upon deploying a website with 20k+ pages.
+Even though the build part takes 2 minutes or so, deploys would hang on the upload step.</p>
+<h2 id="why-not-host-it-on-s3" tabindex="-1">Why not host it on S3 ? <a class="header-anchor" href="#why-not-host-it-on-s3">#</a></h2>
+<p>The next reasonable option would be to host the static website on S3.
+It's a pretty common setup too and is well documented by AWS.</p>
+<p>Because builds should be automated, I tried setting up an AWS Lambda function that runs the build and uploads the files to S3.
+After 2 days of headaches fighting with the AWS docs to understand how to make it work, I managed to finally run it.
+Only to find out that the upload process from the AWS Lambda local storage to S3 is not fast enough.</p>
+<p>I tried parallelizing the uploads using threads, but it was still too slow.
+I managed to get to about 500 pages/minute but the Lambdas have a maximum timeout of 15 minutes so it's not enough.
+In any cases, a build that takes more than 15 minutes would not have been satisfying.</p>
+<p>I'm not an AWS expert, but the whole process was so frustrating that I decided to go old-school and host it on a server I control.</p>
+<h1 id="server-setup" tabindex="-1">Server setup <a class="header-anchor" href="#server-setup">#</a></h1>
+<p>I chose to use <a href="https://www.digitalocean.com/">Digital Ocean (aka DO)</a> for hosting my server, but most of these instructions would be applicable to any other provider (<a href="https://www.scaleway.com//">Scaleway</a>, <a href="https://www.vultr.com/">Vultr</a>, <a href="https://www.exoscale.com">Exoscale</a> ...).</p>
+<p>DO has a great blog about <a href="https://blog.digitalocean.com/deploying-a-fully-automated-git-based-static-website-in-under-5-minutes/">Deploying a Fully-automated Git-based Static Website in Under 5 Minutes</a> which helped me a lot.
+I have condensed the instructions into a shell script: <a href="https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670">https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670</a>.
+If you're not familiar with this kind of setup, I suggest you follow the blog post instead of running the script.</p>
+<p>In order to run the script, SSH into the newly created server and:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token function">wget</span> <span class="token parameter variable">-O</span> - https://gist.github.com/adipasquale/05e432157fcba07b0d2a8cbfdf326670/raw <span class="token operator">|</span> <span class="token function">sh</span></code></pre>
+<p>Here is a quick summary of this script:</p>
+<ul>
+<li>It installs the Caddy server</li>
+<li>It creates a systemd service</li>
+<li>It sets up Caddy to listen to a subdomain of nip.io</li>
+<li>Caddy will use Let's Encrypt to get you a valid SSL certificate so that HTTPS works out-of-the-box.</li>
+<li>It uses the Caddy git plugin to automatically stay in sync with this repo: <a href="https://github.com/kamaln7/basic-static-website">kamaln7/basic-static-website</a></li>
+</ul>
+<p>The last output should point you to an URL that looks like https://YOUR_SERVER_IP.nip.io:</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/IsPIwBrsgR-2046.avif 2046w"><source type="image/webp" srcset="/eleventy-base-blog/img/IsPIwBrsgR-2046.webp 2046w"><img alt="basic static website" loading="lazy" decoding="async" src="/eleventy-base-blog/img/IsPIwBrsgR-2046.png" width="2046" height="1324"></picture></p>
+<p><em>(notice the green lock :)</em></p>
+<p>In case it does not work properly, you can run this command on the server to see logs and exceptions from Caddy:</p>
+<pre><code>tail -f /var/log/syslog
+</code></pre>
+<p><strong>Important Note</strong>: We are skipping a lot of important steps for an actual production server here:</p>
+<ul>
+<li>You should follow <a href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04">this DO guide</a> for securing your Ubuntu droplet</li>
+<li>You should create a DO Firewall <a href="https://cloud.digitalocean.com/networking/firewalls">here</a> and allow SSH, HTTP, and HTTPS inbound traffic</li>
+<li>If you own a domain name, you can add an DNS record of the A type that points to your droplet's IP, or follow <a href="https://www.digitalocean.com/docs/networking/dns/how-to/add-domains/">this short guide</a> to use DO's own name servers. Here, we are using nip.io to have a subdomain without any setup.</li>
+</ul>
+<h1 id="dynamic-build-system" tabindex="-1">Dynamic build system <a class="header-anchor" href="#dynamic-build-system">#</a></h1>
+<p>Currently, the server is synchronizing with a very simple static website project, that has no build script at all.</p>
+<p>We will now switch to a dynamic build system.
+The build script will create HTML pages from external data and template files, and the server will now serve the resulting files.
+This build script will be re-executed upon each git push to the repository.</p>
+<p>For the purpose of this article, I have created a very simple static website builder: <a href="https://github.com/adipasquale/giantsite">giantsite</a>.
+It's a 50-lines Python 3 script, that queries a <a href="https://jsonplaceholder.typicode.com/">dummy API</a> for 5000 photos, builds an HTML page for each and an index page that links to them.</p>
+<p>First, fork <a href="https://github.com/adipasquale/giantsite">giantsite</a>.</p>
+<p>Now let's update Caddy's configuration.
+SSH into the server and update it with <code>vim /etc/caddy/Caddyfile</code>:</p>
+<pre><code># /etc/caddy/Caddyfile
+
+https://YOUR_SERVER_IP.nip.io {
+    [...]
+    git https://github.com/YOUR_GITHUB_HANDLE/giantsite /var/code/giantsite {
+        interval 300
+        then python3 /var/code/giantsite/build.py /var/www
+    }
+    root /var/www
+}
+</code></pre>
+<p><em>(don't forget to replace the CAPITAL_PARTS with your infos)</em></p>
+<p>Here is what we have changed:</p>
+<ul>
+<li>We have switched the GitHub repository from the static one to the dynamically built one that you just forked.</li>
+<li>We have also specified where the local repository should be stored: <code>/var/code/giantsite</code></li>
+<li>We have added a call to the <code>build.py</code> script from the fetched repo in the <code>then</code> option.
+It will be ran upon each new pull.</li>
+<li>Finally, we have declared that the server's root is <code>/var/www</code>.
+It defines the files that will be served.</li>
+</ul>
+<p>We still have to perform a few steps in order for this setup to work.
+Again, ssh into the server and run these commands</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token comment"># Install python3 (it's already installed on DO's droplets)</span>
+<span class="token function">apt</span> <span class="token function">install</span> python3
+
+<span class="token comment"># Create the new folders and set correct permissions</span>
+<span class="token function">mkdir</span> /var/code/
+<span class="token function">mkdir</span> /var/www/
+<span class="token function">chown</span> www-data:www-data /var/code/
+<span class="token function">chown</span> www-data:www-data /var/www/
+
+<span class="token comment"># Restart Caddy, this will trigger a re-build</span>
+systemctl restart caddy</code></pre>
+<p><em>Note : You may have to use <code>sudo</code> here if you're not logged in as root</em></p>
+<p>You should now be able to access your website and see the newly built website :</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/6UM0nCpHBC-718.avif 718w"><source type="image/gif" srcset="/eleventy-base-blog/img/6UM0nCpHBC-718.gif 718w"><img alt="giantsite screencast" loading="lazy" decoding="async" src="/eleventy-base-blog/img/6UM0nCpHBC-718.webp" width="718" height="465"></picture></p>
+<h2 id="auto-deploys-on-push" tabindex="-1">Auto-deploys on push <a class="header-anchor" href="#auto-deploys-on-push">#</a></h2>
+<p>Currently, our Caddy server will synchronize with the GitHub repository every 300 seconds or so.
+Let's setup a Webhook from GitHub to our server, so that it synchronizes and rebuilds upon each push.</p>
+<p>First, open a terminal and copy the output from <code>uuidgen</code>.
+We'll use this random string as a shared secret in our Webhook.</p>
+<p>Now let's setup Caddy so it listens to the Webhook.
+SSH into the server, and run <code>vim /etc/caddy/Caddyfile</code> :</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token comment"># /etc/caddy/Caddyfile</span>
+
+https://YOUR_SERVER_IP.nip.io <span class="token punctuation">{</span>
+    <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    <span class="token function">git</span> <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+        hook /github_hook YOUR_WEBHOOK_SECRET
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>and again, restart Caddy with :</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">systemctl restart caddy</code></pre>
+<p>The last step is to go to your forked GitHub repository's Settings, and click &quot;Add Webhook&quot; in the Webhooks tab. Use <code>https://YOUR_SERVER_IP.nip.io/github_webhook</code> for the url. I suggest using a JSON Webhook, I've had issues with the regular ones</p>
+<p><picture><source type="image/avif" srcset="/eleventy-base-blog/img/0pu8wGHx-U-2020.avif 2020w"><source type="image/webp" srcset="/eleventy-base-blog/img/0pu8wGHx-U-2020.webp 2020w"><img alt="Create a GitHub Webhook" loading="lazy" decoding="async" src="/eleventy-base-blog/img/0pu8wGHx-U-2020.png" width="2020" height="998"></picture>.</p>
+<p>You can now try making a small change to the <code>build.py</code> script and pushing it.
+Your Caddy server should pick it up within a few seconds, and rebuild the pages accordingly.</p>
+<h1 id="bonus-api-to-manually-trigger-re-builds" tabindex="-1">Bonus: API to manually trigger re-builds <a class="header-anchor" href="#bonus-api-to-manually-trigger-re-builds">#</a></h1>
+<p>If your external data is updated, you may want to trigger a build even though the code has not changed.
+It can therefore be useful to have another Webhook that triggers rebuilds and is not linked to GitHub.</p>
+<p>Let's setup a small server that listens to GET requests on <code>/admin/rebuild</code> and triggers builds.
+I'm using <a href="https://bottlepy.org/docs/dev/">bottle</a> here, as it's the simplest one I can think of, but feel free to use any framework you like.</p>
+<p>Create a new <code>server.py</code> file at the root of your forked repository :</p>
+<pre class="language-py" tabindex="0"><code class="language-py"><span class="token comment"># server.py</span>
+
+<span class="token keyword">from</span> build <span class="token keyword">import</span> Builder
+<span class="token keyword">from</span> bottle <span class="token keyword">import</span> route<span class="token punctuation">,</span> run
+
+
+<span class="token decorator annotation punctuation">@route</span><span class="token punctuation">(</span><span class="token string">'/admin/rebuild'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">rebuild</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    Builder<span class="token punctuation">(</span><span class="token string">"/var/www"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>build<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token string">'Rebuild done !'</span>
+
+run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">8000</span><span class="token punctuation">,</span> debug<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span></code></pre>
+<p>Commit it and push it so that your server picks it up.</p>
+<p>Now, SSH into your server and install bottle:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token function">apt</span> update
+<span class="token function">apt</span> <span class="token function">install</span> <span class="token parameter variable">-y</span> python3-pip
+pip3 <span class="token function">install</span> bottle</code></pre>
+<p>You need to create another systemd service for this bottle server:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token comment"># /etc/systemd/system/bottle.service</span>
+
+<span class="token punctuation">[</span>Unit<span class="token punctuation">]</span>
+<span class="token assign-left variable">Description</span><span class="token operator">=</span>Bottle server
+<span class="token assign-left variable">After</span><span class="token operator">=</span>syslog.target
+
+<span class="token punctuation">[</span>Service<span class="token punctuation">]</span>
+<span class="token assign-left variable">Type</span><span class="token operator">=</span>simple
+<span class="token assign-left variable">User</span><span class="token operator">=</span>www-data
+<span class="token assign-left variable">Group</span><span class="token operator">=</span>www-data
+<span class="token assign-left variable">WorkingDirectory</span><span class="token operator">=</span>/var/code/giantsite
+<span class="token assign-left variable">ExecStart</span><span class="token operator">=</span>/usr/bin/env python3 server.py
+<span class="token assign-left variable">StandardOutput</span><span class="token operator">=</span>syslog
+<span class="token assign-left variable">StandardError</span><span class="token operator">=</span>syslog
+<span class="token assign-left variable">Restart</span><span class="token operator">=</span>always
+<span class="token assign-left variable">RestartSec</span><span class="token operator">=</span><span class="token number">2</span>
+
+<span class="token punctuation">[</span>Install<span class="token punctuation">]</span>
+<span class="token assign-left variable">WantedBy</span><span class="token operator">=</span>bottle.target</code></pre>
+<p>This new service can be started with:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">systemctl start bottle
+systemctl <span class="token builtin class-name">enable</span> bottle</code></pre>
+<p>And we also have to update the Caddyfile so that external requests are directed to this bottle server:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token comment"># /etc/caddy/Caddyfile</span>
+
+https://YOUR_SERVER_IP.nip.io <span class="token punctuation">{</span>
+    <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span>
+    proxy /admin localhost:8000 <span class="token punctuation">{</span>
+        transparent
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p><em>Note: I used a namespaced route <code>/admin</code> here but you're free to do as you please. Be careful that it matches what bottle expects though.</em></p>
+<p>Finally, restart Caddy so that the changes are applied:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh">systemctl restart caddy</code></pre>
+<p>Phew! You should now be able to trigger a rebuild with a simple:</p>
+<pre class="language-sh" tabindex="0"><code class="language-sh"><span class="token function">curl</span> https://YOUR_SERVER_IP.nip.io/admin/rebuild</code></pre>
+<p>🛠 Build, Build, Build 🛠</p>
+<h1 id="conclusion" tabindex="-1">Conclusion <a class="header-anchor" href="#conclusion">#</a></h1>
+<p>This setup makes sense only in rare situations, namely when you are building thousands of files.
+It's an interesting experience though, as it shows how easy and convenient Caddy makes it.
+The <a href="https://caddyserver.com/docs/http.git">git plugin</a> is particularly cool, it's so nice to be able to deploy with a simple <code>git push</code>.</p>
+<p>This setup is not ready for production, make sure to add some security measures! The rebuild API is completely unprotected for instance.</p>
+<p>Let me know what you think!</p>
+<p><a href="https://news.ycombinator.com/item?id=18768691">Discuss on Hacker News</a></p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/eleventy-base-blog/blog/2018-12-17-incremental-scraping-with-scrapy-and-mongo/">Incremental crawler with Scrapy and MongoDB</a></li><li>Next: <a href="/eleventy-base-blog/blog/2019-02-28-polaris-react-router/">Combining React Router and Shopify App Bridge Navigation</a></li>
+</ul>
+
+		</main>
+
+		<footer>
+			<nav class="links">
+				<a href="https://github.com/adipasquale">
+					<svg width="100" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>GitHub</title>
+						<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+					</svg>
+					<div>GitHub</div>
+				</a>
+				<a href="mailto:adrien@dipasquale.fr">
+					<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>Mail</title>
+						<path d="M15.61 12c0 1.99-1.62 3.61-3.61 3.61-1.99 0-3.61-1.62-3.61-3.61 0-1.99 1.62-3.61 3.61-3.61 1.99 0 3.61 1.62 3.61 3.61M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12c2.424 0 4.761-.722 6.76-2.087l.034-.024-1.617-1.879-.027.017A9.494 9.494 0 0 1 12 21.54c-5.26 0-9.54-4.28-9.54-9.54 0-5.26 4.28-9.54 9.54-9.54 5.26 0 9.54 4.28 9.54 9.54a9.63 9.63 0 0 1-.225 2.05c-.301 1.239-1.169 1.618-1.82 1.568-.654-.053-1.42-.52-1.426-1.661V12A6.076 6.076 0 0 0 12 5.93 6.076 6.076 0 0 0 5.93 12 6.076 6.076 0 0 0 12 18.07a6.02 6.02 0 0 0 4.3-1.792 3.9 3.9 0 0 0 3.32 1.805c.874 0 1.74-.292 2.437-.821.719-.547 1.256-1.336 1.553-2.285.047-.154.135-.504.135-.507l.002-.013c.175-.76.253-1.52.253-2.457 0-6.617-5.383-12-12-12"></path>
+					</svg>
+					<div>mail adrien@dipasquale.fr</div>
+				</a>
+				<a href="https://ruby.social/@adrien">
+					<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+						<path clip-rule="evenodd" d="m2004.3 228h-.57c-19.87.163-38.97 2.491-50.13 7.601-.5.213-24.58 10.78-24.58 46.99 0 7.394-.14 16.236.09 25.612.4 16.438 2 32.742 7.21 45.957 5.67 14.406 15.47 25.335 32.04 29.72 14.11 3.737 26.23 4.503 35.99 3.967h.01c18.41-1.021 28.71-6.695 28.71-6.695a6.018 6.018 0 0 0 3.16-5.558l-.56-12.178a5.984 5.984 0 0 0 -2.56-4.646 5.995 5.995 0 0 0 -5.24-.804s-11.04 3.471-23.45 3.047c-4.87-.167-9.84-.357-14.18-1.544-3.91-1.069-7.14-3.148-8.76-7.347 5.59.951 13.45 2.021 22.27 2.425 10.49.481 20.33-.592 30.33-1.785 12.37-1.477 23.76-6.688 31.4-13.091 5.8-4.865 9.47-10.509 10.5-15.801v-.001c3.23-16.623 3.05-40.428 3.04-41.319-.01-36.286-24.23-46.801-24.58-46.951-11.14-5.105-30.25-7.436-50.14-7.599zm59.9 93.58.09-.471c3.1-15.948 2.73-38.451 2.73-38.451v-.067c0-27.633-17.49-36.04-17.49-36.04-.01-.008-.03-.016-.05-.024-10.05-4.616-27.33-6.379-45.26-6.527h-.41c-17.93.148-35.2 1.911-45.25 6.527l-.06.024s-17.48 8.407-17.48 36.04c0 7.308-.15 16.047.09 25.314v.004c.36 14.96 1.64 29.826 6.37 41.852 4.27 10.836 11.49 19.221 23.95 22.519 12.65 3.349 23.51 4.066 32.26 3.585 9.61-.533 16.56-2.512 20.36-3.891l-.04-.739c-5.11 1.018-12.33 2.033-20 1.771-16.29-.559-32.69-3.029-35.34-23.016a40.2 40.2 0 0 1 -.35-5.4 6 6 0 0 1 2.3-4.719 5.998 5.998 0 0 1 5.13-1.109s12.59 3.066 28.55 3.798c9.81.45 19.01-.598 28.36-1.713 9.88-1.18 19.01-5.258 25.11-10.372 3.36-2.814 5.83-5.834 6.43-8.895zm-54.2-36.244c.68-2.603 3.99-12.807 14.27-12.807 10.68 0 10.54 12.137 10.54 12.137v34.224c0 3.311 2.69 6 6 6s6-2.689 6-6v-34.406s-.68-23.955-22.54-23.955c-10 0-16.43 5.292-20.4 10.778-4.07-5.273-10.62-10.293-20.78-10.293-6.92 0-11.53 2.138-14.68 4.857-6.67 5.747-6.86 14.826-6.81 16.949l.02.455s-.01-.161-.02-.455v-.052 36.342c0 3.311 2.69 6 6 6s6-2.689 6-6v-36.342c0-.169-.01-.338-.02-.507 0 0-.5-4.577 2.66-7.298 1.45-1.252 3.66-1.949 6.85-1.949 10.65 0 14.18 9.844 14.91 12.386v20.233c0 3.311 2.69 6 6 6s6-2.689 6-6z" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" transform="translate(-1908 -212)"></path>
+					</svg>
+
+					<div>Mastodon</div>
+				</a>
+			</nav>
+
+			<p style="margin-top:2rem;">
+				<small>
+					built with <a href="https://www.11ty.dev/">Eleventy</a> & <a href="https://newcss.net/">new.css</a>
+					·
+					hosted on
+					<a href="https://github.com/adipasquale/adipasquale.github.com">GitHub Pages</a>
+					·
+					last update 2024-03
+				</small>
+			</p>
+
+		</footer>
+
+		<!-- Current page: /eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/ -->
+	</body>
+</html>

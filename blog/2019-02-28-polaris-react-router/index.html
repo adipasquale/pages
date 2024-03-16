@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Combining React Router and Shopify App Bridge Navigation</title>
+		<meta name="description" content="Adrien Di Paquale personal website">
+
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Adrien">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Adrien">
+		<meta name="generator" content="Eleventy v2.0.1">
+
+		<link rel="stylesheet" href="/eleventy-base-blog/css/new.css">
+		<link rel="stylesheet" href="/eleventy-base-blog/css/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="#skip" class="visually-hidden">Skip to main content</a>
+			<h1>Adrien</h1>
+			<h2 class="visually-hidden">Menu</h2>
+			<nav>
+					<a href="/eleventy-base-blog/">
+						Home
+					</a>
+					<a href="/eleventy-base-blog/blog/">
+						Blog
+					</a>
+					<a href="/eleventy-base-blog/pianopiano/">
+						Piano Piano
+					</a>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+
+<link rel="stylesheet" href="/eleventy-base-blog/css/prism-okaidia.css">
+
+<h1>Combining React Router and Shopify App Bridge Navigation</h1>
+
+<p>
+	<time datetime="2019-02-28">
+		28 February 2019
+	</time>
+</p>
+
+<hr>
+
+
+
+<p>In this article we will show you a quick way to navigate correctly inside your react embedded app using shopify app-bridge and polaris libraries.</p>
+<h2 id="linking-links" tabindex="-1">Linking links <a class="header-anchor" href="#linking-links">#</a></h2>
+<p>The first thing to do is to link the react router <code>Link</code>  component with shopify polaris <code>Link</code>. To do so, we pass an Adapter to our <code>AppProvider</code> component. Shopify anticipated this issue so you only have to pass the Adapter to the <code>AppProvider</code> component under the attribute <code>linkComponent</code>. Here is an example :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx"><span class="token keyword">import</span> <span class="token punctuation">{</span> Link <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'react-router-dom'</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> AppProvider <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@shopify/polaris'</span>
+
+<span class="token keyword">function</span> <span class="token function">AdapterLink</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">{</span> url<span class="token punctuation">,</span> <span class="token operator">...</span>rest <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Link</span></span> <span class="token attr-name">to</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>url<span class="token punctuation">}</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token operator">...</span>rest<span class="token punctuation">}</span></span> <span class="token punctuation">/></span></span>
+<span class="token punctuation">}</span>
+
+ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">AppProvider</span></span>
+    <span class="token attr-name">apiKey</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>props<span class="token punctuation">.</span>apiKey<span class="token punctuation">}</span></span>
+    <span class="token attr-name">shopOrigin</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>props<span class="token punctuation">.</span>shopOrigin<span class="token punctuation">}</span></span>
+    <span class="token attr-name">linkComponent</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>AdapterLink<span class="token punctuation">}</span></span>
+  <span class="token punctuation">></span></span><span class="token plain-text">
+  ...
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">AppProvider</span></span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span></code></pre>
+<h2 id="a-history-of-wrap" tabindex="-1">A history of wrap <a class="header-anchor" href="#a-history-of-wrap">#</a></h2>
+<p><a href="https://help.shopify.com/en/api/embedded-apps/app-bridge/actions/navigation/history">Here is how to use the app bridge history object to navigate inside your app.</a></p>
+<p>Now what we want is to provide to the history the url given to our <code>Route</code> component.</p>
+<h3 id="accessing-the-history-object" tabindex="-1">Accessing the history object <a class="header-anchor" href="#accessing-the-history-object">#</a></h3>
+<p>The doc does not tell us how to access the history from inside a react component. But it is actually possible to access it via <a href="https://reactjs.org/docs/context.html">React contexts</a> if your component is between two <code>AppProvider</code> components by adding this :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx"><span class="token keyword">static</span> contextTypes <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">polaris</span><span class="token operator">:</span> PropTypes<span class="token punctuation">.</span>object
+<span class="token punctuation">}</span></code></pre>
+<p>now you can call the <code>appBridge</code> inside your class, like for example in the constuctor :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx"><span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span>context</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">super</span><span class="token punctuation">(</span>props<span class="token punctuation">,</span> context<span class="token punctuation">)</span>
+  <span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>context<span class="token punctuation">.</span>polaris<span class="token punctuation">.</span>appBridge
+<span class="token punctuation">}</span></code></pre>
+<h3 id="wrapper" tabindex="-1">Wrapper <a class="header-anchor" href="#wrapper">#</a></h3>
+<p>To combine both things we have to push the url of the <code>Route</code> inside the polaris history. So what we did is creating a wrapped component that does that every time he receives a new url :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx"><span class="token keyword">import</span> <span class="token punctuation">{</span> History <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@shopify/app-bridge/actions'</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Route <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'react-router-dom'</span>
+
+<span class="token keyword">function</span> <span class="token function">withShopifyEmbeddedAppPushState</span> <span class="token punctuation">(</span><span class="token parameter">WrappedComponent</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token keyword">class</span> <span class="token class-name">extends</span> React<span class="token punctuation">.</span>Component <span class="token punctuation">{</span>
+    <span class="token keyword">static</span> contextTypes <span class="token operator">=</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">polaris</span><span class="token operator">:</span> PropTypes<span class="token punctuation">.</span>object
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token function">componentWillReceiveProps</span> <span class="token punctuation">(</span><span class="token parameter">nextProps</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>context<span class="token punctuation">.</span>polaris<span class="token punctuation">.</span>appBridge
+      <span class="token keyword">const</span> history <span class="token operator">=</span> History<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>app<span class="token punctuation">)</span>
+      history<span class="token punctuation">.</span><span class="token function">dispatch</span><span class="token punctuation">(</span>History<span class="token punctuation">.</span>Action<span class="token punctuation">.</span><span class="token constant">PUSH</span><span class="token punctuation">,</span> nextProps<span class="token punctuation">.</span>computedMatch<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">render</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">WrappedComponent</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token operator">...</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">}</span></span> <span class="token punctuation">/></span></span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">const</span> ShopifyEmbeddedAppRoute <span class="token operator">=</span> <span class="token function">withShopifyEmbeddedAppPushState</span><span class="token punctuation">(</span>Route<span class="token punctuation">)</span></code></pre>
+<h2 id="et-voila" tabindex="-1">Et voilà ! <a class="header-anchor" href="#et-voila">#</a></h2>
+<p>Here is what your rendering should like now :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx">ReactDOM<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>
+   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">AppProvider</span></span>
+     <span class="token attr-name">apiKey</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>props<span class="token punctuation">.</span>apiKey<span class="token punctuation">}</span></span>
+     <span class="token attr-name">shopOrigin</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>props<span class="token punctuation">.</span>shopOrigin<span class="token punctuation">}</span></span>
+     <span class="token attr-name">linkComponent</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>AdapterLink<span class="token punctuation">}</span></span>
+   <span class="token punctuation">></span></span><span class="token plain-text">
+     </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">BrowserRouter</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+       </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span><span class="token plain-text">
+         </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Switch</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+           </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">ShopifyEmbeddedAppRoute</span></span>
+             <span class="token attr-name">path</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">'</span>/products<span class="token punctuation">'</span></span>
+             <span class="token attr-name">render</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span><span class="token parameter">p</span> <span class="token operator">=></span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">ProductsContainer</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token operator">...</span>p<span class="token punctuation">}</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token operator">...</span>props<span class="token punctuation">}</span></span> <span class="token punctuation">/></span></span><span class="token punctuation">}</span></span>
+           <span class="token punctuation">/></span></span><span class="token plain-text">
+         </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">Switch</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+       </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span class="token plain-text">
+     </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">BrowserRouter</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+   </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">AppProvider</span></span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span></code></pre>
+<p>Now if you place links inside your react app :</p>
+<pre class="language-jsx" tabindex="0"><code class="language-jsx"><span class="token keyword">import</span> <span class="token punctuation">{</span> Link <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@shopify/polaris'</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Link</span></span> <span class="token attr-name">url</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">'</span>/products<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token plain-text">Subscription Products</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">Link</span></span><span class="token punctuation">></span></span></code></pre>
+<p>it will call our wrapped component that will push the correct url inside shopify history !
+You are now in the right page with the correct url 🕺</p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/eleventy-base-blog/blog/2018-12-27-build-and-deploy-huge-static-websites-with-caddy/">Build and deploy huge static websites with Caddy</a></li><li>Next: <a href="/eleventy-base-blog/blog/2019-12-10-scraping-tips/">Scraping tips</a></li>
+</ul>
+
+		</main>
+
+		<footer>
+			<nav class="links">
+				<a href="https://github.com/adipasquale">
+					<svg width="100" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>GitHub</title>
+						<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+					</svg>
+					<div>GitHub</div>
+				</a>
+				<a href="mailto:adrien@dipasquale.fr">
+					<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>Mail</title>
+						<path d="M15.61 12c0 1.99-1.62 3.61-3.61 3.61-1.99 0-3.61-1.62-3.61-3.61 0-1.99 1.62-3.61 3.61-3.61 1.99 0 3.61 1.62 3.61 3.61M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12c2.424 0 4.761-.722 6.76-2.087l.034-.024-1.617-1.879-.027.017A9.494 9.494 0 0 1 12 21.54c-5.26 0-9.54-4.28-9.54-9.54 0-5.26 4.28-9.54 9.54-9.54 5.26 0 9.54 4.28 9.54 9.54a9.63 9.63 0 0 1-.225 2.05c-.301 1.239-1.169 1.618-1.82 1.568-.654-.053-1.42-.52-1.426-1.661V12A6.076 6.076 0 0 0 12 5.93 6.076 6.076 0 0 0 5.93 12 6.076 6.076 0 0 0 12 18.07a6.02 6.02 0 0 0 4.3-1.792 3.9 3.9 0 0 0 3.32 1.805c.874 0 1.74-.292 2.437-.821.719-.547 1.256-1.336 1.553-2.285.047-.154.135-.504.135-.507l.002-.013c.175-.76.253-1.52.253-2.457 0-6.617-5.383-12-12-12"></path>
+					</svg>
+					<div>mail adrien@dipasquale.fr</div>
+				</a>
+				<a href="https://ruby.social/@adrien">
+					<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+						<path clip-rule="evenodd" d="m2004.3 228h-.57c-19.87.163-38.97 2.491-50.13 7.601-.5.213-24.58 10.78-24.58 46.99 0 7.394-.14 16.236.09 25.612.4 16.438 2 32.742 7.21 45.957 5.67 14.406 15.47 25.335 32.04 29.72 14.11 3.737 26.23 4.503 35.99 3.967h.01c18.41-1.021 28.71-6.695 28.71-6.695a6.018 6.018 0 0 0 3.16-5.558l-.56-12.178a5.984 5.984 0 0 0 -2.56-4.646 5.995 5.995 0 0 0 -5.24-.804s-11.04 3.471-23.45 3.047c-4.87-.167-9.84-.357-14.18-1.544-3.91-1.069-7.14-3.148-8.76-7.347 5.59.951 13.45 2.021 22.27 2.425 10.49.481 20.33-.592 30.33-1.785 12.37-1.477 23.76-6.688 31.4-13.091 5.8-4.865 9.47-10.509 10.5-15.801v-.001c3.23-16.623 3.05-40.428 3.04-41.319-.01-36.286-24.23-46.801-24.58-46.951-11.14-5.105-30.25-7.436-50.14-7.599zm59.9 93.58.09-.471c3.1-15.948 2.73-38.451 2.73-38.451v-.067c0-27.633-17.49-36.04-17.49-36.04-.01-.008-.03-.016-.05-.024-10.05-4.616-27.33-6.379-45.26-6.527h-.41c-17.93.148-35.2 1.911-45.25 6.527l-.06.024s-17.48 8.407-17.48 36.04c0 7.308-.15 16.047.09 25.314v.004c.36 14.96 1.64 29.826 6.37 41.852 4.27 10.836 11.49 19.221 23.95 22.519 12.65 3.349 23.51 4.066 32.26 3.585 9.61-.533 16.56-2.512 20.36-3.891l-.04-.739c-5.11 1.018-12.33 2.033-20 1.771-16.29-.559-32.69-3.029-35.34-23.016a40.2 40.2 0 0 1 -.35-5.4 6 6 0 0 1 2.3-4.719 5.998 5.998 0 0 1 5.13-1.109s12.59 3.066 28.55 3.798c9.81.45 19.01-.598 28.36-1.713 9.88-1.18 19.01-5.258 25.11-10.372 3.36-2.814 5.83-5.834 6.43-8.895zm-54.2-36.244c.68-2.603 3.99-12.807 14.27-12.807 10.68 0 10.54 12.137 10.54 12.137v34.224c0 3.311 2.69 6 6 6s6-2.689 6-6v-34.406s-.68-23.955-22.54-23.955c-10 0-16.43 5.292-20.4 10.778-4.07-5.273-10.62-10.293-20.78-10.293-6.92 0-11.53 2.138-14.68 4.857-6.67 5.747-6.86 14.826-6.81 16.949l.02.455s-.01-.161-.02-.455v-.052 36.342c0 3.311 2.69 6 6 6s6-2.689 6-6v-36.342c0-.169-.01-.338-.02-.507 0 0-.5-4.577 2.66-7.298 1.45-1.252 3.66-1.949 6.85-1.949 10.65 0 14.18 9.844 14.91 12.386v20.233c0 3.311 2.69 6 6 6s6-2.689 6-6z" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" transform="translate(-1908 -212)"></path>
+					</svg>
+
+					<div>Mastodon</div>
+				</a>
+			</nav>
+
+			<p style="margin-top:2rem;">
+				<small>
+					built with <a href="https://www.11ty.dev/">Eleventy</a> & <a href="https://newcss.net/">new.css</a>
+					·
+					hosted on
+					<a href="https://github.com/adipasquale/adipasquale.github.com">GitHub Pages</a>
+					·
+					last update 2024-03
+				</small>
+			</p>
+
+		</footer>
+
+		<!-- Current page: /eleventy-base-blog/blog/2019-02-28-polaris-react-router/ -->
+	</body>
+</html>

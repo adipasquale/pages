@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Scraping tips</title>
+		<meta name="description" content="Adrien Di Paquale personal website">
+
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.xml" type="application/atom+xml" title="Adrien">
+		<link rel="alternate" href="/eleventy-base-blog/feed/feed.json" type="application/json" title="Adrien">
+		<meta name="generator" content="Eleventy v2.0.1">
+
+		<link rel="stylesheet" href="/eleventy-base-blog/css/new.css">
+		<link rel="stylesheet" href="/eleventy-base-blog/css/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="#skip" class="visually-hidden">Skip to main content</a>
+			<h1>Adrien</h1>
+			<h2 class="visually-hidden">Menu</h2>
+			<nav>
+					<a href="/eleventy-base-blog/">
+						Home
+					</a>
+					<a href="/eleventy-base-blog/blog/">
+						Blog
+					</a>
+					<a href="/eleventy-base-blog/pianopiano/">
+						Piano Piano
+					</a>
+			</nav>
+		</header>
+
+		<main id="skip">
+			
+
+<link rel="stylesheet" href="/eleventy-base-blog/css/prism-okaidia.css">
+
+<h1>Scraping tips</h1>
+
+<p>
+	<time datetime="2019-12-10">
+		10 December 2019
+	</time>
+</p>
+
+<hr>
+
+
+
+<p>Scraping websites can sometimes get tricky, but that's when things gets interesting.
+When you're aiming to scrape data from a website that doesn't want to be scraped, it becomes like a game of cat and mouse.</p>
+<p><img src="https://i.imgur.com/HwN6qYV.jpg" alt=""></p>
+<p>The website tries to identify robots and prevent them from accessing the data, without impacting actual users browsing the website.
+The robots are thus designed to mimick as closely as possible actual users' behaviour, so as to become stealth.</p>
+<p>Here is a list of recommendations, more or less obvious, but always useful to remind of.</p>
+<h2 id="keep-it-simple-stupid" tabindex="-1">Keep It Simple, Stupid <a class="header-anchor" href="#keep-it-simple-stupid">#</a></h2>
+<p>Websites have become complex with Single Page Applications and React, Vue...
+Do not forget that browsing websites comes down to HTTP requests being sent to servers.</p>
+<p>There are two approaches to scraping:</p>
+<ol>
+<li>reproduce individual HTTP requests one by one</li>
+<li>mimick an actual browser and user clicking around</li>
+</ol>
+<p>💁🏽‍♀️ As often as you can, try to use the first method. It is usually much more reliable and efficient.</p>
+<p>However, the two approaches are complimentary.
+Sometimes the second one is necessary, if the interactions between the JS and the HTTP requests are too entangled.</p>
+<h2 id="sniff-out-apis" tabindex="-1">Sniff out APIs <a class="header-anchor" href="#sniff-out-apis">#</a></h2>
+<p>Look for public APIs that return JSON instead of HTML that you have to parse.
+Use your browser's network tab XHR filter to do so.
+This is often the case with Single Page Applications.</p>
+<p><img src="https://i.imgur.com/i6erv0B.gif" alt="Product Hunt GraphQL API"></p>
+<p>Mobile applications also often use an API to collect data from the servers.
+Most of the time this API will be somehow authenticated, but it is sometimes very easy to find a working token.</p>
+<p>⚙️ Use <a href="https://www.charlesproxy.com/">Charles Proxy</a> to listen to outgoing requests from mobile applications.</p>
+<h2 id="know-your-http-basics" tabindex="-1">Know your HTTP basics <a class="header-anchor" href="#know-your-http-basics">#</a></h2>
+<p>HTTP requests have 4 simple characteristics:</p>
+<ol>
+<li>An URL (with optional query string params)</li>
+<li>A verb (aka a method, eg: GET, POST, etc)</li>
+<li>Optional Headers</li>
+<li>An optional body (for non-GET requests)</li>
+</ol>
+<p>The body can be any type of text or binary data, which should be described by the <code>Content-Type</code> header.
+You can find every valid value <a href="http://www.iana.org/assignments/media-types/media-types.xhtml">here</a></p>
+<p>💡 When you get stuck and cannot figure out how the website can block your request, compare these 4 characteristics to an actual request from your browser.</p>
+<p>🔒 Also, prefer HTTPs requests, websites can get suspicious otherwise.</p>
+<h2 id="don-t-reinvent-the-wheel" tabindex="-1">Don't reinvent the wheel <a class="header-anchor" href="#don-t-reinvent-the-wheel">#</a></h2>
+<p>I strongly recommend against using a regular HTTP library (e.g. Python's <a href="https://requests.readthedocs.io/"><code>requests</code></a> or Ruby's <a href="https://github.com/httprb/http"><code>http</code></a>) .
+Instead, build upon a scraping framework like Python's <a href="https://github.com/scrapy/scrapy"><code>Scrapy</code></a>, NodeJS <a href="https://github.com/yujiosaka/headless-chrome-crawler"><code>headless-chrome-scraper</code></a> or Go's <a href="https://github.com/gocolly/colly">Colly</a>.</p>
+<p>You won't have to reimplement super common patterns, like requests throttling, retries policy, links traversal and deduplication, passing cookies...
+As a web framework does for building websites, this will help you focus on the core specific code that targets your websites.</p>
+<p>🙌 <a href="https://github.com/scrapy/scrapy"><code>Scrapy</code></a> is my personal favourite. It is open source with a backing company <a href="https://scrapinghub.com/scrapy-cloud">ScrapingHub</a> that also provides a Heroku-like PaaS service. I'm not affiliated to them in any way, but they provide instant deployment and scheduling, with an extremely low pricing policy (it's often free).</p>
+<h2 id="become-a-curl-ninja" tabindex="-1">Become a curl Ninja <a class="header-anchor" href="#become-a-curl-ninja">#</a></h2>
+<p>You may be tempted to use GUIs like <a href="https://www.getpostman.com/">Postman</a> or <a href="https://insomnia.rest/">Insomnia</a>, but I would suggest you get to learn <code>curl</code> instead.
+It is actually not very complicated and lets you do everything without restrictions.
+You can then reproduce it in any SSH terminal.
+<code>man curl</code> is your friend.</p>
+<p>Use and abuse the &quot;Copy as curl&quot; feature in your network tab, to paste it in a terminal and see if it's reproductible.
+What I often do is try and find the smallest set of headers and body params that still succeds by bissecting down.</p>
+<p><em>Pro Tip</em>: copied curl commands can be lengthy.
+I often copy them in my IDE, search and replace all <code>-H</code> with <code>-H \n</code> (with regex mode activated) to get one line per header.</p>
+<p>⚙️ <a href="https://curl.trillworks.com/">Python to curl</a> is a tool that converts curl commands to Python <code>requests</code> call.</p>
+<h2 id="best-practices-for-scrapers" tabindex="-1">Best practices for scrapers <a class="header-anchor" href="#best-practices-for-scrapers">#</a></h2>
+<ul>
+<li>Fetch first, store the response and then parse it. This way you won't have to refetch if there is a bug in your parser.</li>
+<li>You can also use caching locally when developping to bypass this problem</li>
+<li>Distribute the workload in successive steps. eg. for a cooking website, first retrieve all recipes URLs and then fetch them instead of directly following every nested link.</li>
+</ul>
+<h2 id="it-works-on-my-computer" tabindex="-1">It works on my computer™️ <a class="header-anchor" href="#it-works-on-my-computer">#</a></h2>
+<p>As often, the scraper you wrote may work locally but not in production.</p>
+<p>One source of issues is the IP of your server that may be blacklisted.
+It is easy for the defending websites to block whole range of IPs that are known to come from datacenters, or to whitelist specific countries IPs.
+The usual counter for this is to use proxies.
+You will find countless services that sell proxies access on the internet, with varying quality.
+Sometimes you won't have a choice but to use residential proxies that are costy (&gt;100USD/mo.).</p>
+<p>⚙️ <a href="https://icanhazip.com/">icanhazip</a> is a simpleway to check the IP you're currently scraping from.</p>
+<p>Another source of trouble is the classical environment differences that you forgot about.
+For example, you may generate timestamps in your code and format them to forge requests, and the timezone may be different on your machine and on the production server.</p>
+<p>⚙️ <a href="https://httpbin.org/">httpbin</a> can be useful to double check that the received data by the distant server is actually what you meant to send.</p>
+<h2 id="have-fun" tabindex="-1">Have fun! <a class="header-anchor" href="#have-fun">#</a></h2>
+<p>Figuring out how to bypass another developer's protections can be a really fun puzzle to solve.</p>
+<p>🤜🤛 Be a good citizen and scrape responsibly:</p>
+<ul>
+<li>Space out requests so they don't overflow the website.</li>
+<li>Only scrape public data</li>
+<li>If you encounter private or sensitive data that should not be public, warn the website.</li>
+</ul>
+<p><em>Written by <a href="https://github.com/maelorn">Ismaël Attoumani</a> and <a href="https://twitter.com/hypertextadrien/">Adrien Di Pasquale</a>, proofread by <a href="https://twitter.com/AntoineAugusti">Antoine Augusti</a></em></p>
+
+<ul class="links-nextprev"><li>Previous: <a href="/eleventy-base-blog/blog/2019-02-28-polaris-react-router/">Combining React Router and Shopify App Bridge Navigation</a></li>
+</ul>
+
+		</main>
+
+		<footer>
+			<nav class="links">
+				<a href="https://github.com/adipasquale">
+					<svg width="100" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>GitHub</title>
+						<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+					</svg>
+					<div>GitHub</div>
+				</a>
+				<a href="mailto:adrien@dipasquale.fr">
+					<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<title>Mail</title>
+						<path d="M15.61 12c0 1.99-1.62 3.61-3.61 3.61-1.99 0-3.61-1.62-3.61-3.61 0-1.99 1.62-3.61 3.61-3.61 1.99 0 3.61 1.62 3.61 3.61M12 0C5.383 0 0 5.383 0 12s5.383 12 12 12c2.424 0 4.761-.722 6.76-2.087l.034-.024-1.617-1.879-.027.017A9.494 9.494 0 0 1 12 21.54c-5.26 0-9.54-4.28-9.54-9.54 0-5.26 4.28-9.54 9.54-9.54 5.26 0 9.54 4.28 9.54 9.54a9.63 9.63 0 0 1-.225 2.05c-.301 1.239-1.169 1.618-1.82 1.568-.654-.053-1.42-.52-1.426-1.661V12A6.076 6.076 0 0 0 12 5.93 6.076 6.076 0 0 0 5.93 12 6.076 6.076 0 0 0 12 18.07a6.02 6.02 0 0 0 4.3-1.792 3.9 3.9 0 0 0 3.32 1.805c.874 0 1.74-.292 2.437-.821.719-.547 1.256-1.336 1.553-2.285.047-.154.135-.504.135-.507l.002-.013c.175-.76.253-1.52.253-2.457 0-6.617-5.383-12-12-12"></path>
+					</svg>
+					<div>mail adrien@dipasquale.fr</div>
+				</a>
+				<a href="https://ruby.social/@adrien">
+					<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+						<path clip-rule="evenodd" d="m2004.3 228h-.57c-19.87.163-38.97 2.491-50.13 7.601-.5.213-24.58 10.78-24.58 46.99 0 7.394-.14 16.236.09 25.612.4 16.438 2 32.742 7.21 45.957 5.67 14.406 15.47 25.335 32.04 29.72 14.11 3.737 26.23 4.503 35.99 3.967h.01c18.41-1.021 28.71-6.695 28.71-6.695a6.018 6.018 0 0 0 3.16-5.558l-.56-12.178a5.984 5.984 0 0 0 -2.56-4.646 5.995 5.995 0 0 0 -5.24-.804s-11.04 3.471-23.45 3.047c-4.87-.167-9.84-.357-14.18-1.544-3.91-1.069-7.14-3.148-8.76-7.347 5.59.951 13.45 2.021 22.27 2.425 10.49.481 20.33-.592 30.33-1.785 12.37-1.477 23.76-6.688 31.4-13.091 5.8-4.865 9.47-10.509 10.5-15.801v-.001c3.23-16.623 3.05-40.428 3.04-41.319-.01-36.286-24.23-46.801-24.58-46.951-11.14-5.105-30.25-7.436-50.14-7.599zm59.9 93.58.09-.471c3.1-15.948 2.73-38.451 2.73-38.451v-.067c0-27.633-17.49-36.04-17.49-36.04-.01-.008-.03-.016-.05-.024-10.05-4.616-27.33-6.379-45.26-6.527h-.41c-17.93.148-35.2 1.911-45.25 6.527l-.06.024s-17.48 8.407-17.48 36.04c0 7.308-.15 16.047.09 25.314v.004c.36 14.96 1.64 29.826 6.37 41.852 4.27 10.836 11.49 19.221 23.95 22.519 12.65 3.349 23.51 4.066 32.26 3.585 9.61-.533 16.56-2.512 20.36-3.891l-.04-.739c-5.11 1.018-12.33 2.033-20 1.771-16.29-.559-32.69-3.029-35.34-23.016a40.2 40.2 0 0 1 -.35-5.4 6 6 0 0 1 2.3-4.719 5.998 5.998 0 0 1 5.13-1.109s12.59 3.066 28.55 3.798c9.81.45 19.01-.598 28.36-1.713 9.88-1.18 19.01-5.258 25.11-10.372 3.36-2.814 5.83-5.834 6.43-8.895zm-54.2-36.244c.68-2.603 3.99-12.807 14.27-12.807 10.68 0 10.54 12.137 10.54 12.137v34.224c0 3.311 2.69 6 6 6s6-2.689 6-6v-34.406s-.68-23.955-22.54-23.955c-10 0-16.43 5.292-20.4 10.778-4.07-5.273-10.62-10.293-20.78-10.293-6.92 0-11.53 2.138-14.68 4.857-6.67 5.747-6.86 14.826-6.81 16.949l.02.455s-.01-.161-.02-.455v-.052 36.342c0 3.311 2.69 6 6 6s6-2.689 6-6v-36.342c0-.169-.01-.338-.02-.507 0 0-.5-4.577 2.66-7.298 1.45-1.252 3.66-1.949 6.85-1.949 10.65 0 14.18 9.844 14.91 12.386v20.233c0 3.311 2.69 6 6 6s6-2.689 6-6z" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" transform="translate(-1908 -212)"></path>
+					</svg>
+
+					<div>Mastodon</div>
+				</a>
+			</nav>
+
+			<p style="margin-top:2rem;">
+				<small>
+					built with <a href="https://www.11ty.dev/">Eleventy</a> & <a href="https://newcss.net/">new.css</a>
+					·
+					hosted on
+					<a href="https://github.com/adipasquale/adipasquale.github.com">GitHub Pages</a>
+					·
+					last update 2024-03
+				</small>
+			</p>
+
+		</footer>
+
+		<!-- Current page: /eleventy-base-blog/blog/2019-12-10-scraping-tips/ -->
+	</body>
+</html>

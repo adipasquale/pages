@@ -1,7 +1,7 @@
 ---
-layout: layouts/home.njk
+layout: layouts/base.njk
 eleventyNavigation:
-  key: Accueil
+  key: Home
   order: 1
 numberOfLatestPostsToShow: 3
 ---
@@ -40,6 +40,7 @@ numberOfLatestPostsToShow: 3
         height: 8rem;
         border-radius: 10px;
         margin: 0;
+				object-fit: contain;
       }
     }
   }
@@ -97,7 +98,7 @@ numberOfLatestPostsToShow: 3
 
 {% set postsCount = collections.posts | length %}
 {% set latestPostsCount = postsCount | min(numberOfLatestPostsToShow) %}
-<h1>Latest {{ latestPostsCount }} blog post{% if latestPostsCount != 1 %}s{% endif %}</h1>
+<h2 style="margin-top: 4rem;">Latest {{ latestPostsCount }} blog post{% if latestPostsCount != 1 %}s{% endif %}</h2>
 
 {% set postslist = collections.posts | head(-1 * numberOfLatestPostsToShow) %}
 {% set postslistCounter = postsCount %}

@@ -100,6 +100,12 @@ mark {
   }
 }
 
+main a:not([href^="/"])::after,
+footer p a:not([href^="/"])::after {
+  content: ' ↗';
+  display: inline;
+}
+
 /* specific to eleventy blog template */
 
 .links-nextprev {

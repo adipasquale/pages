@@ -1,0 +1,59 @@
+---
+layout: layouts/base.njk
+eleventyNavigation:
+  key: Piano Piano
+  order: 3
+---
+
+<h1>
+  Piano Piano 🎹 🎹
+</h1>
+
+<dl>
+  <dt>SIREN</dt>
+  <dd>
+    <span id="siren">845 260 298</span>
+    <button data-target="#siren">copier</button>
+  </dd>
+  <dt>SIRET</dt>
+  <dd>
+    <span id="siret">845 260 298 00037</span>
+    <button data-target="#siret">copier</button>
+  </dd>
+  <dt>TVA</dt>
+  <dd>
+    <span id="tva">FR19 845 260 298</span>
+    <button data-target="#tva">copier</button>
+  </dd>
+  <dt>IBAN</dt>
+  <dd>
+    <span id="iban">FR76 1695 8000 0113 5599 9575 445</span>
+    <button data-target="#iban">copier</button>
+  </dd>
+  <dt>plus d'infos</dt>
+  <dd>
+    <a href="https://annuaire-entreprises.data.gouv.fr/entreprise/845260298">
+      annuaire-entreprises
+    </a>
+  </dd>
+</dl>
+
+<style>
+  dl {
+    margin-top: 2rem;
+    dd {
+      margin-bottom: 1rem;
+    }
+  }
+</style>
+
+<script>
+  const copy = (button) => {
+    const text = document.querySelector(button.dataset.target).innerHTML.replace(/ /g, "")
+    navigator.clipboard.writeText(text);
+    button.innerHTML = "copié !"
+    setTimeout(() => button.innerHTML = "copier", 1000)
+  }
+  document.querySelectorAll("button").forEach(button => button.addEventListener("click", () => copy(button)))
+</script>
+

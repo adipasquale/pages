@@ -1,8 +1,8 @@
 /* NEW CSS overrides */
 
-h1 { font-size: 1.5rem; }
-h2 { font-size: 1.25rem; }
-h3 { font-size: 1.125rem; }
+h1 { font-size: 1.3rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1.1rem; }
 h4 { font-size: 1rem; }
 h5 { font-size: 1rem; }
 h6 { font-size: 1rem; }
@@ -14,7 +14,8 @@ h6 { font-size: 1rem; }
 }
 
 @media (prefers-color-scheme: dark) {
-  a {
+  a,
+  header nav span {
     color: #FFD845;
   }
 
@@ -29,10 +30,23 @@ img {
 
 /* HEADER */
 
-header nav {
+header {
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+
+  nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    margin: 0;
+    padding: 0;
+  }
 }
+
 
 /* FOOTER */
 

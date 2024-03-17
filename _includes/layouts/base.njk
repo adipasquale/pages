@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{ title or metadata.title }}</title>
+		<title>{{ title or "Adrien" }}</title>
 		<meta name="description" content="{{ description or metadata.description }}">
 
 		<link rel="alternate" href="/feed/feed.xml" type="application/atom+xml" title="{{ metadata.title }}">
@@ -14,6 +14,8 @@
 
 		<link rel="stylesheet" href="/css/new.css">
 		<link rel="stylesheet" href="/css/style.css">
+
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐵</text></svg>">
 	</head>
 	<body>
 		<header>
@@ -22,9 +24,13 @@
 			<h2 class="visually-hidden">Menu</h2>
 			<nav>
 				{%- for entry in collections.all | eleventyNavigation %}
-					<a href="{{ entry.url }}"{% if entry.url == page.url %} aria-current="page"{% endif %}>
-						{{ entry.title }}
-					</a>
+					{% if entry.url == page.url %}
+						<span>{{entry.title}}</span>
+					{% else %}
+						<a href="{{ entry.url }}">
+							{{ entry.title }}
+						</a>
+					{% endif %}
 				{%- endfor %}
 			</nav>
 		</header>

@@ -1,5 +1,5 @@
 module.exports = {
-	title: "Adrien",
+	title: "🐵 Adrien",
 	url: "https://www.dipasquale.fr/",
 	language: "en",
 	description: "Adrien Di Paquale personal website",

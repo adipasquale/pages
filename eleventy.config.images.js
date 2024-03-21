@@ -13,20 +13,20 @@ function isFullUrl(url) {
 	try {
 		new URL(url);
 		return true;
-	} catch(e) {
+	} catch (e) {
 		return false;
 	}
 }
 
-module.exports = function(eleventyConfig) {
+module.exports = function (eleventyConfig) {
 	// Eleventy Image shortcode
 	// https://www.11ty.dev/docs/plugins/image/
 	eleventyConfig.addAsyncShortcode("image", async function imageShortcode(src, alt, widths, sizes) {
 		// Full list of formats here: https://www.11ty.dev/docs/plugins/image/#output-formats
 		// Warning: Avif can be resource-intensive so take care!
-		let formats = ["avif", "webp", "auto"];
+		let formats = ["webp", "auto"];
 		let input;
-		if(isFullUrl(src)) {
+		if (isFullUrl(src)) {
 			input = src;
 		} else {
 			input = relativeToInputPath(this.page.inputPath, src);

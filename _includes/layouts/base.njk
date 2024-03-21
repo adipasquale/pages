@@ -15,14 +15,14 @@
 		<link rel="stylesheet" href="/css/new.css">
 		<link rel="stylesheet" href="/css/style.css">
 
-	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐵</text></svg>">
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐵</text></svg>">
 	</head>
 	<body>
 		<header>
 			<a href="#skip" class="visually-hidden">Skip to main content</a>
-			<h1>{{ metadata.title }}</h1>
-			<h2 class="visually-hidden">Menu</h2>
 			<nav>
+				<h1>{{ metadata.title }}</h1>
+				<h2 class="visually-hidden">Menu</h2>
 				{%- for entry in collections.all | eleventyNavigation %}
 					{% if entry.url == page.url %}
 						<span>{{entry.title}}</span>

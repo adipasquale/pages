@@ -26,6 +26,12 @@ h6 { font-size: 1rem; }
 
 img {
   height: auto;
+  width: auto;
+}
+
+img, video {
+  max-width: 100%;
+  max-height: 80vh;
 }
 
 /* HEADER */
@@ -91,7 +97,7 @@ footer {
 
 body {
   box-sizing: border-box;
-  min-height: 100dvh;
+  min-height: 101dvh; /* 101 forces scrollbar appearance on desktop to avoid flickering */
   display: flex;
   flex-direction: column;
   padding-bottom: 0;

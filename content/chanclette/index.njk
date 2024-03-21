@@ -1,0 +1,12 @@
+---
+layout: layouts/base.njk
+eleventyNavigation:
+  key: ⛵️ Voile
+  order: 4
+---
+<h2>Voile · Chanclette</h2>
+
+{% image "./a-terre.jpg", "Chanclette" %}
+
+{% set postslist = collections.chanclette %}
+{% include "postslist.njk" %}

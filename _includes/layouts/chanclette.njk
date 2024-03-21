@@ -1,0 +1,29 @@
+---
+layout: layouts/base.njk
+---
+
+{# Only include the syntax highlighter CSS on blog posts #}
+<link rel="stylesheet" href="/css/prism-okaidia.css" />
+
+<h1>{{ title }}</h1>
+
+<p>
+	<time datetime="{{ page.date | htmlDateString }}">
+		{{ page.date | readableDate }}
+	</time>
+</p>
+
+<hr>
+
+{{ content | safe }}
+
+{%- if collections.chanclette %}
+{%- set previousPost = collections.chanclette | getPreviousCollectionItem %}
+{%- set nextPost = collections.chanclette | getNextCollectionItem %}
+{%- if nextPost or previousPost %}
+<ul class="links-nextprev">
+	{%- if previousPost %}<li>Previous: <a href="{{ previousPost.url }}">{{ previousPost.data.title }}</a></li>{% endif %}
+	{%- if nextPost %}<li>Next: <a href="{{ nextPost.url }}">{{ nextPost.data.title }}</a></li>{% endif %}
+</ul>
+{%- endif %}
+{%- endif %}

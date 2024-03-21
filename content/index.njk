@@ -6,22 +6,11 @@ eleventyNavigation:
 numberOfLatestPostsToShow: 3
 ---
 
-<h2>Pages</h2>
+<h2>Welcome !</h2>
 
 <ul>
 	<li><a href="/about/">About</a></li>
+	<li><a href="/dev-blog/">Dev Blog</a></li>
 	<li><a href="/pianopiano/">Piano Piano</a></li>
+	<li><a href="/chanclette/">⛵️ Voile</a></li>
 </ul>
-
-{% set postsCount = collections.posts | length %}
-{% set latestPostsCount = postsCount | min(numberOfLatestPostsToShow) %}
-<h2>Latest blog posts</h2>
-
-{% set postslist = collections.posts | head(-1 * numberOfLatestPostsToShow) %}
-{% set postslistCounter = postsCount %}
-{% include "postslist.njk" %}
-
-{% set morePosts = postsCount - numberOfLatestPostsToShow %}
-{% if morePosts > 0 %}
-<p>{{ morePosts }} more post{% if morePosts != 1 %}s{% endif %} can be found in <a href="/blog/">the blog</a>.</p>
-{% endif %}

@@ -1,12 +1,20 @@
 ---
 layout: layouts/base.njk
 eleventyNavigation:
-  key: ⛵️ Voile
+  key: ⛵ Voile · Chanclette
   order: 4
 ---
-<h2>Voile · Chanclette</h2>
+<h2>⛵ Voile · Chanclette</h2>
 
 {% image "./a-terre.jpg", "Chanclette" %}
 
 {% set postslist = collections.chanclette %}
-{% include "postslist.njk" %}
+
+<ol reversed class="postlist">
+	{% for post in postslist | reverse %}
+		<li class="postlist-item{% if post.url == url %} postlist-item-active{% endif %}">
+			<a href="{{ post.url }}" class="postlist-link">{% if post.data.title %}{{ post.data.title }}{% else %}<code>{{ post.url }}</code>{% endif %}</a>
+			<time class="postlist-date" datetime="{{ post.date | htmlDateString }}">{{ post.date | readableDateFrench("LLLL yyyy") }}</time>
+		</li>
+	{% endfor %}
+</ol>

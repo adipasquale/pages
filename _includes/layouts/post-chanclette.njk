@@ -1,0 +1,50 @@
+---
+layout: layouts/base.njk
+---
+
+<nav class="breadcrumbs">
+	<a href="/chanclette">⛵ Voile · Chanclette</a>
+	›
+	{{ title }}
+</nav>
+
+<h1>{{ title }}</h1>
+
+<ul class="meta">
+	<li>
+		<time datetime="{{ page.date | htmlDateString }}">
+			{{ page.date | readableDateFrench }}
+		</time>
+	</li>
+
+	<li>
+		{%- if chantier_temps and chantier_cout %}
+			Durée du chantier : {{ chantier_temps }}
+			· Coût : {{ chantier_cout }}
+		{%- endif %}
+	</li>
+</ul>
+
+<style>
+	ul.meta {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+</style>
+
+<hr>
+
+{{ content | safe }}
+
+{%- if collections.chanclette %}
+{%- set previousPost = collections.chanclette | getPreviousCollectionItem %}
+{%- set nextPost = collections.chanclette | getNextCollectionItem %}
+{%- if nextPost or previousPost %}
+<ul class="links-nextprev">
+	{%- if previousPost %}<li>Article suivant: <a href="{{ previousPost.url }}">{{ previousPost.data.title }}</a></li>{% endif %}
+	{%- if nextPost %}<li>Article précédent: <a href="{{ nextPost.url }}">{{ nextPost.data.title }}</a></li>{% endif %}
+</ul>
+{%- endif %}
+{%- endif %}

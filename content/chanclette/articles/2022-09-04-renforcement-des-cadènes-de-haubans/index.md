@@ -2,8 +2,8 @@
 title: Renforcement des cadènes de haubans
 date: 2022-09-04
 # thumb_path: ./cadene-nue.jpg
-# chantier_temps: 1 semaine
-# chantier_cout: ~100€
+chantier_temps: 1 semaine
+chantier_cout: ~100€
 ---
 
 Pour éviter le soulèvement du pont au niveau des cadènes, il a fallu renforcer les renvois intérieurs.

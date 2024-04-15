@@ -2,5 +2,5 @@ module.exports = {
 	tags: [
 		"dev"
 	],
-	"layout": "layouts/post.njk",
+	"layout": "layouts/post-dev.njk",
 };

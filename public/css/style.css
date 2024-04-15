@@ -120,7 +120,7 @@ mark {
   }
 }
 
-main a:not([href^="/"])::after,
+main a:not([href^="/"]):not([href^="#"])::after,
 footer p a:not([href^="/"])::after {
   content: ' ↗';
   display: inline;
@@ -134,4 +134,10 @@ footer p a:not([href^="/"])::after {
 
 .visually-hidden{
   display: none;
+}
+
+/* COMPONENTS */
+
+.breadcrumbs {
+  font-size: 0.8em;
 }

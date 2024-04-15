@@ -2,8 +2,8 @@
 title: Réparation du safran
 date: 2022-03-27
 # thumb_path: /assets/safran-bois-fini.jpg
-# chantier_temps: 3 semaines
-# chantier_cout: 500€ de main d'oeuvre + ~600€ de matériel
+chantier_temps: 3 semaines
+chantier_cout: 500€ de main d'oeuvre + ~600€ de matériel
 ---
 
 Le décalage entre la barre franche et l'axe du safran devenait de plus en plus important. Il devenait urgent d'ouvrir le safran pour l'inspecter et le réparer.

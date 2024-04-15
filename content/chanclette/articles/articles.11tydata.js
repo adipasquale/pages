@@ -2,5 +2,5 @@ module.exports = {
 	tags: [
 		"chanclette"
 	],
-	"layout": "layouts/chanclette.njk",
+	"layout": "layouts/post-chanclette.njk",
 };

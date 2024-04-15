@@ -2,8 +2,8 @@
 title: Renforcement du pont sous le pied de mât
 date: 2021-07-01
 # thumb_path: /assets/stratification.jpg
-# chantier_temps: 3-4 semaines en dilettante
-# chantier_cout: 300€ de main d'oeuvre + ~200€ de matériel + 750€ de gréement
+chantier_temps: 3-4 semaines en dilettante
+chantier_cout: 300€ de main d'oeuvre + ~200€ de matériel + 750€ de gréement
 ---
 
 Le pont était enfoncé sous le pied de mât. Cela signalait un probable délaminage du pont qui pouvait s'avérer dangereux à cet endroit. Il a donc fallu restratifier cette partie.

@@ -24,7 +24,7 @@
 				<h1>{{ metadata.title }}</h1>
 				<h2 class="visually-hidden">Menu</h2>
 				{%- for entry in collections.all | eleventyNavigation %}
-					{% if entry.url == page.url %}
+					{% if (entry.url == "/" and entry.url == page.url) or (entry.url != "/" and entry.url in page.url) %}
 						<span>{{entry.title}}</span>
 					{% else %}
 						<a href="{{ entry.url }}">

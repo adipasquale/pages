@@ -5,11 +5,18 @@ layout: layouts/base.njk
 {# Only include the syntax highlighter CSS on blog posts #}
 <link rel="stylesheet" href="/css/prism-okaidia.css" />
 
+<nav class="breadcrumbs">
+	<a href="/dev">🐧 Dev Blog</a>
+	›
+	{{ title }}
+</nav>
+
+
 <h1>{{ title }}</h1>
 
 <p>
 	<time datetime="{{ page.date | htmlDateString }}">
-		{{ page.date | readableDate }}
+		{{ page.date | readableDateEnglish }}
 	</time>
 </p>
 
